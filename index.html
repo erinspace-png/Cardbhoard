@@ -315,6 +315,12 @@ function MasterSetsTab({ masterSets, setMasterSets }) {
         page++;
       }
       all.sort((a,b)=>(parseInt(a.number)||0)-(parseInt(b.number)||0));
+      // Debug: log first card's tcgplayer prices to console
+      if (all.length > 0) {
+        console.log("Sample card (first):", all[0].name, "| tcgplayer prices:", JSON.stringify(all[0].tcgplayer?.prices));
+        const withPokeball = all.filter(c => c.tcgplayer?.prices?.pokeBallReverseHolofoil);
+        console.log("Cards with pokeBallReverseHolofoil BEFORE refetch:", withPokeball.length);
+      }
       // For cards with only 1 variant from bulk fetch, re-fetch individually to get full price data
       const needsRefetch = all.filter(c => Object.keys(c.tcgplayer?.prices||{}).length <= 1);
       if (needsRefetch.length > 0) {
@@ -333,6 +339,9 @@ function MasterSetsTab({ masterSets, setMasterSets }) {
             }
           } catch {}
         }
+        const withPokeballAfter = all.filter(c => c.tcgplayer?.prices?.pokeBallReverseHolofoil);
+        console.log("Cards with pokeBallReverseHolofoil AFTER refetch:", withPokeballAfter.length);
+        if (withPokeballAfter.length > 0) console.log("Example:", withPokeballAfter[0].name, JSON.stringify(withPokeballAfter[0].tcgplayer?.prices));
       }
       // Expand cards into variants
       const entries = [];
