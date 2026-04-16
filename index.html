@@ -1,102 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Pokémon Card Tracker</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #ffffff; --bg2: #f4f4f3; --bg3: #ececea;
-    --text: #1a1a18; --text2: #6b6b67; --text3: #9b9b97;
-    --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.22);
-    --info-bg: #e6f1fb; --info-text: #185fa5; --info-border: #85b7eb;
-    --success-bar: #639922;
-    --danger-text: #a32d2d;
-    --radius: 8px; --radius-lg: 12px;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1e1e1c; --bg2: #2a2a28; --bg3: #343432;
-      --text: #f0f0ee; --text2: #a0a09c; --text3: #6b6b67;
-      --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
-      --info-bg: #0c447c; --info-text: #b5d4f4; --info-border: #378add;
-      --success-bar: #97c459;
-      --danger-text: #f09595;
-    }
-  }
-  body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg3); color: var(--text); font-size: 16px; line-height: 1.5; }
-  #root { max-width: 740px; margin: 0 auto; padding: 20px 16px 60px; }
-  h1 { font-size: 20px; font-weight: 500; }
-  h3 { font-size: 15px; font-weight: 500; }
-  input, button { font-family: inherit; font-size: 14px; color: var(--text); }
-  input[type=text] { background: var(--bg); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 8px 12px; outline: none; width: 100%; }
-  input[type=text]:focus { border-color: var(--info-border); box-shadow: 0 0 0 2px rgba(55,138,221,0.15); }
-  button { background: var(--bg); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 7px 14px; cursor: pointer; color: var(--text); transition: background 0.15s; }
-  button:hover { background: var(--bg2); }
-  button:active { transform: scale(0.98); }
-  input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--info-border); flex-shrink: 0; }
-  .pill { display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; border: 0.5px solid var(--border); background: var(--bg2); color: var(--text); }
-  .pill.active { background: var(--info-bg); color: var(--info-text); border-color: var(--info-border); font-weight: 500; }
-  .pill-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
-  .row { display: flex; align-items: center; gap: 10px; }
-  .card-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--bg2); border-radius: var(--radius); border: 0.5px solid var(--border); margin-bottom: 4px; }
-  .card-item img { width: 36px; height: 50px; object-fit: contain; border-radius: 3px; flex-shrink: 0; }
-  .card-name { font-weight: 500; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .card-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
-  .variant-tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 8px; margin-top: 2px; background: var(--bg3); color: var(--text2); border: 0.5px solid var(--border); }
-  .card-price { font-size: 13px; font-weight: 500; text-align: right; flex-shrink: 0; }
-  .remove-btn { font-size: 11px; color: var(--danger-text); background: none; border: none; cursor: pointer; padding: 2px 0; display: block; margin-top: 2px; }
-  .tab-bar { display: flex; gap: 2px; border-bottom: 0.5px solid var(--border); margin-bottom: 20px; }
-  .tab-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 9px 14px; font-size: 13px; color: var(--text2); cursor: pointer; border-radius: 0; margin-bottom: -1px; }
-  .tab-btn.active { color: var(--text); border-bottom-color: var(--text); font-weight: 500; }
-  .badge { display: inline-block; background: var(--info-bg); color: var(--info-text); border-radius: 10px; padding: 1px 6px; font-size: 11px; margin-left: 5px; }
-  .stat-card { background: var(--bg2); border-radius: var(--radius); padding: 14px 16px; border: 0.5px solid var(--border); flex: 1 1 140px; }
-  .stat-label { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
-  .stat-val { font-size: 22px; font-weight: 500; }
-  .stat-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
-  .progress-bar { height: 6px; background: var(--bg3); border-radius: 4px; overflow: hidden; margin-top: 6px; }
-  .progress-fill { height: 100%; background: var(--success-bar); border-radius: 4px; transition: width 0.3s; }
-  .set-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
-  .set-stat { background: var(--bg3); border-radius: var(--radius); padding: 7px 10px; }
-  .set-stat-label { font-size: 10px; color: var(--text3); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
-  .set-stat-val { font-size: 14px; font-weight: 500; color: var(--text); }
-  .collapsible-body { overflow: hidden; transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease; }
-  .collapsible-body.open { max-height: 9999px; opacity: 1; }
-  .collapsible-body.closed { max-height: 0; opacity: 0; }
-  .section-header { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--radius); background: var(--bg2); border: 0.5px solid var(--border); margin-bottom: 6px; cursor: pointer; user-select: none; }
-  .section-header:hover { background: var(--bg3); }
-  .section-name { font-weight: 500; font-size: 15px; }
-  .section-meta { margin-left: auto; font-size: 13px; color: var(--text2); white-space: nowrap; }
-  .chevron { font-size: 11px; color: var(--text3); flex-shrink: 0; transition: transform 0.2s; }
-  .chevron.open { transform: rotate(180deg); }
-  .grand-total { background: var(--bg2); border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border: 0.5px solid var(--border); }
-  .total-label { font-size: 12px; color: var(--text2); }
-  .total-val { font-size: 22px; font-weight: 500; }
-  .search-box { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px; margin-bottom: 14px; }
-  .empty { color: var(--text2); font-size: 14px; padding: 30px 0; text-align: center; }
-  .flex-gap { display: flex; gap: 8px; }
-  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-  .logo-circle { width: 36px; height: 36px; border-radius: 50%; background: var(--info-bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .scrollable { max-height: 520px; overflow-y: auto; }
-  .danger-btn { color: var(--danger-text); }
-  .small-btn { font-size: 12px; padding: 4px 10px; }
-  .wishlist-tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--info-bg); color: var(--info-text); flex-shrink: 0; }
-  .variant-pill { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: var(--radius); background: var(--bg2); border: 0.5px solid var(--border); margin-bottom: 3px; cursor: pointer; user-select: none; transition: background 0.15s, border-color 0.15s; }
-  .variant-pill:hover { background: var(--info-bg); border-color: var(--info-border); }
-  .variant-pill:hover .vp-label { color: var(--info-text); }
-  .variant-pill:hover .vp-price { color: var(--info-text); }
-  .variant-pill.checked { background: var(--info-bg); border-color: var(--info-border); opacity: 0.6; }
-  .variant-pill.checked .vp-label { color: var(--info-text); text-decoration: line-through; }
-  .vp-label { flex: 1; font-size: 12px; color: var(--text2); }
-  .vp-price { font-size: 12px; font-weight: 500; color: var(--text); }
-  .synth-badge { font-size: 10px; padding: 1px 5px; border-radius: 6px; background: var(--bg3); color: var(--text3); border: 0.5px solid var(--border); margin-left: 4px; flex-shrink: 0; }
-  .card-group { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
-  .card-group-img { width: 56px; height: 78px; object-fit: contain; border-radius: 4px; flex-shrink: 0; }
-  .card-group-info { flex: 1; min-width: 0; }
+:root {
+  --pk-blue:#2724DB; --pk-blue-light:#5654f0;
+  --pk-red:#FF0015; --pk-red-light:#ff4455;
+  --bg:#0e1a2e; --bg-card:rgba(255,255,255,0.06); --bg-card-hover:rgba(255,255,255,0.1);
+  --bg-input:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.12); --border-strong:rgba(255,255,255,0.22);
+  --text:#f0f4ff; --text2:#8fa3c0; --text3:#4a607a;
+  --glass:rgba(255,255,255,0.07); --glass-hover:rgba(255,255,255,0.13);
+  --radius:10px; --radius-lg:14px;
+  --success:#3db87a;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh;}
+#root{max-width:740px;margin:0 auto;padding:24px 16px 80px;}
+h1{font-size:20px;font-weight:500;}
+input,button{font-family:inherit;font-size:14px;color:var(--text);}
+input[type=text]{background:var(--bg-input);border:0.5px solid var(--border);border-radius:var(--radius);padding:9px 13px;outline:none;width:100%;color:var(--text);transition:border-color 0.18s,box-shadow 0.18s;}
+input[type=text]::placeholder{color:var(--text3);}
+input[type=text]:focus{border-color:var(--pk-blue-light);box-shadow:0 0 0 3px rgba(39,36,219,0.2);}
+input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--pk-blue);flex-shrink:0;}
+button{background:var(--glass);border:0.5px solid var(--border);border-radius:var(--radius);padding:8px 16px;cursor:pointer;color:var(--text);transition:background 0.18s,border-color 0.18s;}
+button:hover{background:var(--glass-hover);border-color:var(--border-strong);}
+button:active{transform:scale(0.98);}
+.btn-blue{background:rgba(39,36,219,0.28);border-color:rgba(86,84,240,0.5);color:#c0bfff;}
+.btn-blue:hover{background:rgba(39,36,219,0.45);border-color:var(--pk-blue-light);color:#e0dfff;}
+.btn-red{background:rgba(255,0,21,0.18);border-color:rgba(255,68,85,0.4);color:#ffb0b8;}
+.btn-red:hover{background:rgba(255,0,21,0.32);border-color:var(--pk-red-light);color:#ffd0d5;}
+.small-btn{font-size:12px;padding:5px 11px;}
+
+/* Glass card */
+.glass-card{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);backdrop-filter:blur(12px);}
+
+/* Header */
+.app-header{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+.header-icon{width:38px;height:38px;border-radius:50%;background:rgba(39,36,219,0.25);border:0.5px solid rgba(86,84,240,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* Tab bar */
+.tab-bar{display:flex;gap:4px;background:rgba(255,255,255,0.05);border:0.5px solid var(--border);border-radius:13px;padding:4px;margin-bottom:22px;}
+.tab-btn{flex:1;padding:9px 4px;text-align:center;font-size:13px;color:#fff;border-radius:10px;cursor:pointer;border:none;background:none;transition:background 0.22s,box-shadow 0.22s,color 0.22s;font-weight:400;}
+.tab-btn:hover:not(.active-blue):not(.active-red){background:var(--glass-hover);}
+.tab-btn.active-blue{background:var(--pk-blue);color:#fff;font-weight:500;box-shadow:0 2px 14px rgba(39,36,219,0.55);}
+.tab-btn.active-red{background:var(--pk-red);color:#fff;font-weight:500;box-shadow:0 2px 14px rgba(255,0,21,0.45);}
+.badge{display:inline-block;background:rgba(255,255,255,0.18);color:#fff;border-radius:10px;padding:1px 6px;font-size:11px;margin-left:4px;}
+
+/* Pills */
+.pill-wrap{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+.pill{display:inline-flex;align-items:center;padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;border:0.5px solid var(--border);background:var(--glass);color:var(--text);backdrop-filter:blur(8px);transition:all 0.18s;}
+.pill:hover{background:var(--glass-hover);border-color:var(--border-strong);}
+.pill.pill-blue{background:rgba(39,36,219,0.22);border-color:rgba(86,84,240,0.45);color:#c0bfff;font-weight:500;}
+.pill.pill-red{background:rgba(255,0,21,0.18);border-color:rgba(255,68,85,0.4);color:#ffb0b8;font-weight:500;}
+
+/* Set header card */
+.set-card{padding:16px;margin-bottom:12px;}
+.set-top{display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;}
+.set-name{font-size:15px;font-weight:500;margin-bottom:2px;}
+.set-sub{font-size:12px;color:var(--text2);margin-bottom:6px;}
+.progress-track{height:5px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;background:var(--pk-blue);transition:width 0.4s;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.stat-tile{background:rgba(255,255,255,0.04);border:0.5px solid var(--border);border-radius:8px;padding:8px 10px;}
+.stat-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--text3);margin-bottom:3px;}
+.stat-val{font-size:14px;font-weight:500;color:var(--text);}
+
+/* Section header (buy list) */
+.sec-hdr{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--glass);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:6px;cursor:pointer;transition:background 0.18s;}
+.sec-hdr:hover{background:var(--glass-hover);}
+.sec-name{font-size:14px;font-weight:500;flex:1;}
+.sec-meta{font-size:12px;color:var(--text2);white-space:nowrap;}
+.chevron{font-size:11px;color:var(--text3);flex-shrink:0;transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);}
+.chevron.open{transform:rotate(180deg);}
+
+/* Collapsible */
+.collapsible{overflow:hidden;transition:max-height 0.38s cubic-bezier(0.4,0,0.2,1),opacity 0.3s ease;}
+.collapsible.open{max-height:9999px;opacity:1;}
+.collapsible.closed{max-height:0;opacity:0;}
+
+/* Card group */
+.card-group{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;}
+.card-group-img{width:56px;height:78px;object-fit:contain;border-radius:5px;flex-shrink:0;border:0.5px solid var(--border);}
+.card-group-info{flex:1;min-width:0;}
+.card-name{font-weight:500;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.card-sub{font-size:11px;color:var(--text2);}
+
+/* Card item (wishlists) */
+.card-item{display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--glass);border-radius:var(--radius);border:0.5px solid var(--border);margin-bottom:5px;}
+.card-item img{width:36px;height:50px;object-fit:contain;border-radius:4px;flex-shrink:0;}
+.card-price{font-size:13px;font-weight:500;text-align:right;flex-shrink:0;color:var(--text);}
+.remove-btn{font-size:11px;color:#ffb0b8;background:none;border:none;cursor:pointer;padding:2px 0;display:block;margin-top:2px;}
+.variant-tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:6px;margin-top:3px;background:rgba(255,255,255,0.06);color:var(--text2);border:0.5px solid var(--border);}
+
+/* Variant pill */
+.variant-pill{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:var(--glass);border:0.5px solid var(--border);margin-bottom:3px;cursor:pointer;user-select:none;transition:background 0.18s,border-color 0.18s;}
+.variant-pill:hover{background:rgba(39,36,219,0.18);border-color:rgba(86,84,240,0.4);}
+.variant-pill.checked{background:rgba(39,36,219,0.2);border-color:rgba(86,84,240,0.4);opacity:0.6;}
+.variant-pill.checked .vp-label{text-decoration:line-through;color:var(--text3);}
+.vp-label{flex:1;font-size:12px;color:var(--text2);}
+.vp-price{font-size:12px;font-weight:500;color:var(--text);}
+.no-price-badge{font-size:10px;padding:2px 6px;border-radius:5px;background:rgba(255,255,255,0.05);border:0.5px solid var(--border);color:var(--text3);}
+
+/* Grand total */
+.grand-total{display:flex;justify-content:space-between;align-items:center;background:rgba(39,36,219,0.14);border:0.5px solid rgba(86,84,240,0.28);border-radius:var(--radius-lg);padding:13px 16px;margin-bottom:18px;}
+.total-lbl{font-size:11px;color:var(--text2);margin-bottom:2px;}
+.total-val{font-size:22px;font-weight:500;}
+
+/* Stat cards (stats tab) */
+.stat-card{background:var(--glass);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;flex:1 1 140px;}
+.stat-card-lbl{font-size:12px;color:var(--text2);margin-bottom:4px;}
+.stat-card-val{font-size:22px;font-weight:500;}
+.stat-card-grid{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
+
+/* Search box */
+.search-box{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px;}
+.empty{color:var(--text2);font-size:14px;padding:30px 0;text-align:center;}
+.flex-gap{display:flex;gap:8px;}
+.row{display:flex;align-items:center;gap:10px;}
+.scrollable{max-height:520px;overflow-y:auto;}
+.wishlist-tag{font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,0,21,0.18);color:#ffb0b8;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -104,278 +132,218 @@
 <script type="text/babel">
 const { useState, useEffect } = React;
 
-// ─── Constants ────────────────────────────────────────────────────────────────
 const API = "https://api.pokemontcg.io/v2";
 const VARIANTS_URL = "https://raw.githubusercontent.com/erinspace-png/Cardboard-Hoard/main/variants.json";
 
 const VARIANT_LABELS = {
-  normal: "Normal", holofoil: "Holofoil", reverseHolofoil: "Reverse Holofoil",
-  masterBallReverseHolofoil: "Master Ball Reverse Holo",
-  pokeBallReverseHolofoil: "Poké Ball Reverse Holo",
-  energyReverseHolofoil: "Energy Reverse Holo",
-  ballReverseHolofoil: "Ball Reverse Holo",
-  "1stEditionHolofoil": "1st Edition Holofoil",
-  "1stEditionNormal": "1st Edition Normal",
-  unlimitedHolofoil: "Unlimited Holofoil",
+  normal:"Normal", holofoil:"Holofoil", reverseHolofoil:"Reverse Holofoil",
+  masterBallReverseHolofoil:"Master Ball Reverse Holo",
+  pokeBallReverseHolofoil:"Poké Ball Reverse Holo",
+  energyReverseHolofoil:"Energy Reverse Holo",
+  ballReverseHolofoil:"Ball Reverse Holo",
+  "1stEditionHolofoil":"1st Edition Holofoil",
+  "1stEditionNormal":"1st Edition Normal",
+  unlimitedHolofoil:"Unlimited Holofoil",
 };
 const VARIANT_ORDER = ["normal","holofoil","reverseHolofoil","pokeBallReverseHolofoil","masterBallReverseHolofoil","energyReverseHolofoil","ballReverseHolofoil","1stEditionNormal","1stEditionHolofoil","unlimitedHolofoil"];
 const FALLBACK_VARIANTS = {
-  "sv8pt5": [{ key:"pokeBallReverseHolofoil", label:"Poké Ball Reverse Holo", applicableTo:"all" },{ key:"masterBallReverseHolofoil", label:"Master Ball Reverse Holo", applicableTo:"pokemon" }],
-  "sv105":  [{ key:"pokeBallReverseHolofoil", label:"Poké Ball Reverse Holo", applicableTo:"all" },{ key:"masterBallReverseHolofoil", label:"Master Ball Reverse Holo", applicableTo:"pokemon" }],
-  "sv106":  [{ key:"pokeBallReverseHolofoil", label:"Poké Ball Reverse Holo", applicableTo:"all" },{ key:"masterBallReverseHolofoil", label:"Master Ball Reverse Holo", applicableTo:"pokemon" }],
-  "me2pt5": [{ key:"energyReverseHolofoil", label:"Energy Reverse Holo", applicableTo:"all" },{ key:"ballReverseHolofoil", label:"Ball Reverse Holo", applicableTo:"all" }],
+  "sv8pt5":[{key:"pokeBallReverseHolofoil",label:"Poké Ball Reverse Holo",applicableTo:"all"},{key:"masterBallReverseHolofoil",label:"Master Ball Reverse Holo",applicableTo:"pokemon"}],
+  "sv105":[{key:"pokeBallReverseHolofoil",label:"Poké Ball Reverse Holo",applicableTo:"all"},{key:"masterBallReverseHolofoil",label:"Master Ball Reverse Holo",applicableTo:"pokemon"}],
+  "sv106":[{key:"pokeBallReverseHolofoil",label:"Poké Ball Reverse Holo",applicableTo:"all"},{key:"masterBallReverseHolofoil",label:"Master Ball Reverse Holo",applicableTo:"pokemon"}],
+  "me2pt5":[{key:"energyReverseHolofoil",label:"Energy Reverse Holo",applicableTo:"all"},{key:"ballReverseHolofoil",label:"Ball Reverse Holo",applicableTo:"all"}],
 };
 
-// ─── Variant data loader ──────────────────────────────────────────────────────
 let SET_EXTRA_VARIANTS = {};
-
 async function loadVariantsData() {
   try {
     const r = await fetch(VARIANTS_URL);
     const d = await r.json();
-    Object.entries(d.sets || {}).forEach(([setId, setData]) => {
-      SET_EXTRA_VARIANTS[setId] = setData.variants;
-    });
+    Object.entries(d.sets||{}).forEach(([id,data])=>{ SET_EXTRA_VARIANTS[id]=data.variants; });
   } catch(e) {
-    console.warn("Could not load variants.json, using fallback:", e);
+    console.warn("variants.json load failed, using fallback:",e);
     SET_EXTRA_VARIANTS = FALLBACK_VARIANTS;
   }
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-const lstore = (k, fb) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } };
-const sstore = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
-const fmt = n => n != null ? `$${Number(n).toFixed(2)}` : null;
-const vid = (cardId, vKey) => `${cardId}__${vKey}`;
-
-function labelFromKey(k) {
-  return VARIANT_LABELS[k] || k.replace(/([A-Z])/g,' $1').replace(/^./,s=>s.toUpperCase()).trim();
-}
-function isExCard(card) {
-  return (card.subtypes||[]).some(s=>["EX","GX","V","VMAX","VSTAR","ex","Mega","BREAK","LEGEND","Prism Star","ACE SPEC","Radiant"].includes(s));
-}
-function isPokemon(card) { return card.supertype === "Pokémon"; }
+const lstore=(k,fb)=>{ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):fb; } catch{ return fb; }};
+const sstore=(k,v)=>{ try{ localStorage.setItem(k,JSON.stringify(v)); } catch{} };
+const fmt=n=>n!=null?`$${Number(n).toFixed(2)}`:null;
+const vid=(cid,vk)=>`${cid}__${vk}`;
+const labelFromKey=k=>VARIANT_LABELS[k]||k.replace(/([A-Z])/g,' $1').replace(/^./,s=>s.toUpperCase()).trim();
+const isEx=c=>(c.subtypes||[]).some(s=>["EX","GX","V","VMAX","VSTAR","ex","Mega","BREAK","LEGEND","Prism Star","ACE SPEC","Radiant"].includes(s));
+const isPokemon=c=>c.supertype==="Pokémon";
 
 function getAPIVariants(card) {
-  const prices = card.tcgplayer?.prices || {};
-  const keys = Object.keys(prices);
+  const prices=card.tcgplayer?.prices||{}; const keys=Object.keys(prices);
   if (!keys.length) return [];
-  const sorted = [...VARIANT_ORDER.filter(k=>keys.includes(k)), ...keys.filter(k=>!VARIANT_ORDER.includes(k)).sort()];
-  return sorted.map(k => ({ key:k, label:labelFromKey(k), price: prices[k]?.market ?? prices[k]?.mid ?? null, isSynth:false }));
+  const sorted=[...VARIANT_ORDER.filter(k=>keys.includes(k)),...keys.filter(k=>!VARIANT_ORDER.includes(k)).sort()];
+  return sorted.map(k=>({key:k,label:labelFromKey(k),price:prices[k]?.market??prices[k]?.mid??null,isSynth:false}));
 }
-function getSynthVariants(card, setId) {
-  const rules = SET_EXTRA_VARIANTS[setId];
-  if (!rules || isExCard(card)) return [];
-  const apiKeys = Object.keys(card.tcgplayer?.prices || {});
-  return rules
-    .filter(r => !apiKeys.includes(r.key) && !(r.applicableTo === "pokemon" && !isPokemon(card)))
-    .map(r => ({ key:r.key, label:r.label, price:null, isSynth:true }));
+function getSynthVariants(card,setId) {
+  const rules=SET_EXTRA_VARIANTS[setId];
+  if (!rules||isEx(card)) return [];
+  const apiKeys=Object.keys(card.tcgplayer?.prices||{});
+  return rules.filter(r=>!apiKeys.includes(r.key)&&!(r.applicableTo==="pokemon"&&!isPokemon(card))).map(r=>({key:r.key,label:r.label,price:null,isSynth:true}));
 }
-function getAllVariants(card, setId) {
-  const api = getAPIVariants(card);
-  const synth = getSynthVariants(card, setId);
-  if (!api.length && !synth.length) return [{ key:"normal", label:"Normal", price:null, isSynth:false }];
-  return [...api, ...synth];
+function getAllVariants(card,setId) {
+  const api=getAPIVariants(card); const synth=getSynthVariants(card,setId);
+  if (!api.length&&!synth.length) return [{key:"normal",label:"Normal",price:null,isSynth:false}];
+  return [...api,...synth];
 }
 function groupByCard(entries) {
-  const groups = [], seen = {};
-  entries.forEach(e => {
-    if (!seen[e.cardId]) { seen[e.cardId] = true; groups.push({ cardId:e.cardId, card:e.card, variants:[] }); }
-    groups.find(g=>g.cardId===e.cardId).variants.push(e);
-  });
+  const groups=[],seen={};
+  entries.forEach(e=>{ if (!seen[e.cardId]){seen[e.cardId]=true;groups.push({cardId:e.cardId,card:e.card,variants:[]});} groups.find(g=>g.cardId===e.cardId).variants.push(e); });
   return groups;
 }
 
-// ─── VariantPill ──────────────────────────────────────────────────────────────
-function VariantPill({ label, price, isSynth, checked, onToggle }) {
+function VariantPill({label,price,isSynth,checked,onToggle}) {
   return (
     <div className={`variant-pill${checked?" checked":""}`} onClick={onToggle}>
-      <input type="checkbox" checked={!!checked} onChange={()=>{}} onClick={e=>e.stopPropagation()} style={{pointerEvents:"none"}} />
+      <input type="checkbox" checked={!!checked} onChange={()=>{}} onClick={e=>e.stopPropagation()} style={{pointerEvents:"none"}}/>
       <span className="vp-label">{label}</span>
-      <span className="vp-price">{price != null ? fmt(price) : <span className="synth-badge">no price</span>}</span>
+      <span className="vp-price">{price!=null?fmt(price):<span className="no-price-badge">no price</span>}</span>
     </div>
   );
 }
 
-// ─── CardGroup — card image + name + variants ─────────────────────────────────
-function CardGroup({ card, variants, renderVariant }) {
+function CardGroup({card,variants,renderVariant}) {
   return (
     <div style={{marginBottom:10}}>
       <div className="card-name" style={{marginBottom:1}}>{card.name}</div>
       <div className="card-sub" style={{marginBottom:6}}>#{card.number} · {card.rarity||"Unknown"}</div>
       <div className="card-group">
-        {card.images?.small && (
-          <img src={card.images.small} alt={card.name} className="card-group-img" loading="lazy" />
-        )}
-        <div className="card-group-info">
-          {variants.map(v => renderVariant(v))}
-        </div>
+        {card.images?.small&&<img src={card.images.small} alt={card.name} className="card-group-img" loading="lazy"/>}
+        <div className="card-group-info">{variants.map(v=>renderVariant(v))}</div>
       </div>
     </div>
   );
 }
 
-// ─── CardSearch ───────────────────────────────────────────────────────────────
-function CardSearch({ onAdd, placeholder }) {
-  const [q,setQ] = useState(""); const [results,setResults] = useState([]); const [loading,setLoading] = useState(false); const [searched,setSearched] = useState(false);
-  const search = async () => {
-    if (!q.trim()) return; setLoading(true); setSearched(true);
-    try { const r = await fetch(`${API}/cards?q=name:"${encodeURIComponent(q.trim())}"&pageSize=20`); const d = await r.json(); setResults(d.data||[]); } catch { setResults([]); }
-    setLoading(false);
-  };
+function CardSearch({onAdd,placeholder}) {
+  const [q,setQ]=useState(""); const [results,setResults]=useState([]); const [loading,setLoading]=useState(false); const [searched,setSearched]=useState(false);
+  const search=async()=>{ if (!q.trim()) return; setLoading(true); setSearched(true); try{ const r=await fetch(`${API}/cards?q=name:"${encodeURIComponent(q.trim())}"&pageSize=20`); const d=await r.json(); setResults(d.data||[]); } catch{ setResults([]); } setLoading(false); };
   return (
     <div>
       <div className="flex-gap" style={{marginBottom:12}}>
-        <input type="text" value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>e.key==="Enter"&&search()} placeholder={placeholder||"Search cards..."} />
-        <button onClick={search} style={{flexShrink:0}}>Search</button>
+        <input type="text" value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>e.key==="Enter"&&search()} placeholder={placeholder||"Search cards..."}/>
+        <button onClick={search} className="btn-blue" style={{flexShrink:0}}>Search</button>
       </div>
-      {loading && <div className="empty" style={{padding:"10px 0"}}>Searching...</div>}
-      {searched && !loading && !results.length && <div className="empty" style={{padding:"10px 0"}}>No results found.</div>}
+      {loading&&<div className="empty" style={{padding:"10px 0"}}>Searching...</div>}
+      {searched&&!loading&&!results.length&&<div className="empty" style={{padding:"10px 0"}}>No results found.</div>}
       <div style={{maxHeight:340,overflowY:"auto"}}>
-        {results.map(card => {
-          const variants = getAllVariants(card, card.set?.id);
-          return (
-            <div key={card.id} style={{marginBottom:10}}>
-              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
-                {card.images?.small && <img src={card.images.small} alt={card.name} style={{width:32,height:45,objectFit:"contain",borderRadius:3,flexShrink:0}} loading="lazy" />}
-                <div><div className="card-name">{card.name}</div><div className="card-sub">{card.set?.name} · {card.rarity||"Unknown"}</div></div>
-              </div>
-              <div style={{paddingLeft:40,display:"flex",flexWrap:"wrap",gap:4}}>
-                {variants.map(v => (
-                  <button key={v.key} className="small-btn" onClick={()=>onAdd(card,v.key,v.label,v.price)} style={{fontSize:11}}>
-                    + {v.label}{v.price!=null?` (${fmt(v.price)})`:""}
-                  </button>
-                ))}
-              </div>
+        {results.map(card=>{ const variants=getAllVariants(card,card.set?.id); return (
+          <div key={card.id} style={{marginBottom:10}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+              {card.images?.small&&<img src={card.images.small} alt={card.name} style={{width:32,height:45,objectFit:"contain",borderRadius:4,flexShrink:0}} loading="lazy"/>}
+              <div><div className="card-name">{card.name}</div><div className="card-sub">{card.set?.name} · {card.rarity||"Unknown"}</div></div>
             </div>
-          );
-        })}
+            <div style={{paddingLeft:40,display:"flex",flexWrap:"wrap",gap:4}}>
+              {variants.map(v=><button key={v.key} className="small-btn" onClick={()=>onAdd(card,v.key,v.label,v.price)} style={{fontSize:11}}>+ {v.label}{v.price!=null?` (${fmt(v.price)})`:"" }</button>)}
+            </div>
+          </div>
+        );})}
       </div>
     </div>
   );
 }
 
-// ─── WishlistsTab ─────────────────────────────────────────────────────────────
-function WishlistsTab({ wishlists, setWishlists }) {
-  const [active,setActive] = useState(null); const [newName,setNewName] = useState(""); const [showCreate,setShowCreate] = useState(false);
-  const [showSearch,setShowSearch] = useState(false); const [renaming,setRenaming] = useState(null); const [renameVal,setRenameVal] = useState("");
-  const create = () => { if (!newName.trim()) return; const id = Date.now().toString(); setWishlists([...wishlists,{id,name:newName.trim(),entries:[]}]); setNewName(""); setShowCreate(false); setActive(id); };
-  const del = id => { setWishlists(wishlists.filter(l=>l.id!==id)); if (active===id) setActive(null); };
-  const addEntry = (listId,card,vKey,vLabel,price) => { const e = {uid:Date.now().toString(),card,variantKey:vKey,variantLabel:vLabel,price}; setWishlists(wishlists.map(l=>l.id===listId?{...l,entries:[...l.entries,e]}:l)); };
-  const removeEntry = (listId,uid) => setWishlists(wishlists.map(l=>l.id===listId?{...l,entries:l.entries.filter(e=>e.uid!==uid)}:l));
-  const rename = id => { if (!renameVal.trim()) return; setWishlists(wishlists.map(l=>l.id===id?{...l,name:renameVal.trim()}:l)); setRenaming(null); };
-  const cur = wishlists.find(l=>l.id===active); const entries = cur?.entries||[];
+function WishlistsTab({wishlists,setWishlists}) {
+  const [active,setActive]=useState(null); const [newName,setNewName]=useState(""); const [showCreate,setShowCreate]=useState(false);
+  const [showSearch,setShowSearch]=useState(false); const [renaming,setRenaming]=useState(null); const [renameVal,setRenameVal]=useState("");
+  const create=()=>{ if (!newName.trim()) return; const id=Date.now().toString(); setWishlists([...wishlists,{id,name:newName.trim(),entries:[]}]); setNewName(""); setShowCreate(false); setActive(id); };
+  const del=id=>{ setWishlists(wishlists.filter(l=>l.id!==id)); if (active===id) setActive(null); };
+  const addEntry=(lid,card,vKey,vLabel,price)=>{ const e={uid:Date.now().toString(),card,variantKey:vKey,variantLabel:vLabel,price}; setWishlists(wishlists.map(l=>l.id===lid?{...l,entries:[...l.entries,e]}:l)); };
+  const removeEntry=(lid,uid)=>setWishlists(wishlists.map(l=>l.id===lid?{...l,entries:l.entries.filter(e=>e.uid!==uid)}:l));
+  const rename=id=>{ if (!renameVal.trim()) return; setWishlists(wishlists.map(l=>l.id===id?{...l,name:renameVal.trim()}:l)); setRenaming(null); };
+  const cur=wishlists.find(l=>l.id===active); const entries=cur?.entries||[];
   return (
     <div>
       <div className="pill-wrap">
-        {wishlists.map(l=>(
-          <span key={l.id} className={`pill${active===l.id?" active":""}`} onClick={()=>{setActive(l.id);setShowSearch(false);}}>
-            {l.name} <span style={{fontSize:11,opacity:0.7,marginLeft:4}}>({(l.entries||[]).length})</span>
-          </span>
-        ))}
+        {wishlists.map(l=><span key={l.id} className={`pill${active===l.id?" pill-red":""}`} onClick={()=>{setActive(l.id);setShowSearch(false);}}>{l.name}<span style={{fontSize:11,opacity:0.6,marginLeft:4}}>({(l.entries||[]).length})</span></span>)}
         <button onClick={()=>setShowCreate(!showCreate)}>+ New List</button>
       </div>
-      {showCreate && (<div className="flex-gap" style={{marginBottom:16}}><input type="text" value={newName} onChange={e=>setNewName(e.target.value)} onKeyDown={e=>e.key==="Enter"&&create()} placeholder="List name..." /><button onClick={create}>Create</button><button onClick={()=>setShowCreate(false)}>Cancel</button></div>)}
-      {cur && (
+      {showCreate&&<div className="flex-gap" style={{marginBottom:16}}><input type="text" value={newName} onChange={e=>setNewName(e.target.value)} onKeyDown={e=>e.key==="Enter"&&create()} placeholder="List name..."/><button className="btn-blue" onClick={create}>Create</button><button onClick={()=>setShowCreate(false)}>Cancel</button></div>}
+      {cur&&(
         <div>
           <div className="row" style={{marginBottom:12}}>
             {renaming===cur.id
-              ? (<><input type="text" value={renameVal} onChange={e=>setRenameVal(e.target.value)} onKeyDown={e=>e.key==="Enter"&&rename(cur.id)} style={{maxWidth:200}} /><button onClick={()=>rename(cur.id)}>Save</button><button onClick={()=>setRenaming(null)}>Cancel</button></>)
-              : (<><h3>{cur.name}</h3>{entries.length>0&&<span style={{fontSize:13,color:"var(--text2)"}}>{fmt(entries.reduce((t,e)=>t+(e.price||0),0))||"$0.00"}</span>}<button className="small-btn" onClick={()=>{setRenaming(cur.id);setRenameVal(cur.name);}}>Rename</button><button className="small-btn danger-btn" onClick={()=>del(cur.id)}>Delete list</button></>)}
-            <button onClick={()=>setShowSearch(!showSearch)} style={{marginLeft:"auto"}}>{showSearch?"Hide search":"+ Add cards"}</button>
+              ?<><input type="text" value={renameVal} onChange={e=>setRenameVal(e.target.value)} onKeyDown={e=>e.key==="Enter"&&rename(cur.id)} style={{maxWidth:200}}/><button className="btn-blue small-btn" onClick={()=>rename(cur.id)}>Save</button><button className="small-btn" onClick={()=>setRenaming(null)}>Cancel</button></>
+              :<><h3 style={{fontSize:15,fontWeight:500}}>{cur.name}</h3>{entries.length>0&&<span style={{fontSize:13,color:"var(--text2)"}}>{fmt(entries.reduce((t,e)=>t+(e.price||0),0))||"$0.00"}</span>}<button className="small-btn" onClick={()=>{setRenaming(cur.id);setRenameVal(cur.name);}}>Rename</button><button className="small-btn btn-red" onClick={()=>del(cur.id)}>Delete list</button></>}
+            <button className="btn-blue small-btn" onClick={()=>setShowSearch(!showSearch)} style={{marginLeft:"auto"}}>{showSearch?"Hide search":"+ Add cards"}</button>
           </div>
-          {showSearch && <div className="search-box"><CardSearch onAdd={(card,vKey,vLabel,price)=>addEntry(cur.id,card,vKey,vLabel,price)} placeholder="Search for a card..." /></div>}
-          {!entries.length && !showSearch && <div className="empty">No cards yet. Click "+ Add cards" to search.</div>}
-          {entries.map(e => (
+          {showSearch&&<div className="search-box"><CardSearch onAdd={(card,vKey,vLabel,price)=>addEntry(cur.id,card,vKey,vLabel,price)} placeholder="Search for a card..."/></div>}
+          {!entries.length&&!showSearch&&<div className="empty">No cards yet. Click "+ Add cards" to search.</div>}
+          {entries.map(e=>(
             <div key={e.uid} className="card-item">
-              {e.card.images?.small && <img src={e.card.images.small} alt={e.card.name} loading="lazy" />}
-              <div style={{flex:1,minWidth:0}}>
-                <div className="card-name">{e.card.name}</div>
-                <div className="card-sub">{e.card.set?.name} · {e.card.rarity||"Unknown"}</div>
-                <span className="variant-tag">{e.variantLabel}</span>
-              </div>
-              <div className="card-price">{e.price!=null?fmt(e.price):"N/A"}<button className="remove-btn" onClick={()=>removeEntry(cur.id,e.uid)}>remove</button></div>
+              {e.card.images?.small&&<img src={e.card.images.small} alt={e.card.name} loading="lazy"/>}
+              <div style={{flex:1,minWidth:0}}><div className="card-name">{e.card.name}</div><div className="card-sub">{e.card.set?.name} · {e.card.rarity||"Unknown"}</div><span className="variant-tag">{e.variantLabel}</span></div>
+              <div className="card-price">{e.price!=null?fmt(e.price):<span className="no-price-badge">no price</span>}<button className="remove-btn" onClick={()=>removeEntry(cur.id,e.uid)}>remove</button></div>
             </div>
           ))}
         </div>
       )}
-      {!cur && wishlists.length>0 && <div className="empty">Select a wishlist above.</div>}
-      {!wishlists.length && !showCreate && <div className="empty">No wishlists yet. Create one to get started.</div>}
+      {!cur&&wishlists.length>0&&<div className="empty">Select a wishlist above.</div>}
+      {!wishlists.length&&!showCreate&&<div className="empty">No wishlists yet. Create one to get started.</div>}
     </div>
   );
 }
 
-// ─── MasterSetsTab ────────────────────────────────────────────────────────────
-function MasterSetsTab({ masterSets, setMasterSets }) {
-  const [active,setActive] = useState(null); const [q,setQ] = useState(""); const [setResults,setSetResults] = useState([]);
-  const [loadingSet,setLoadingSet] = useState(false); const [loadingCards,setLoadingCards] = useState(false);
-  const [showSearch,setShowSearch] = useState(false); const [collapsed,setCollapsed] = useState({});
+function MasterSetsTab({masterSets,setMasterSets}) {
+  const [active,setActive]=useState(null); const [q,setQ]=useState(""); const [setResults,setSetResults]=useState([]);
+  const [loadingSet,setLoadingSet]=useState(false); const [loadingCards,setLoadingCards]=useState(false);
+  const [showSearch,setShowSearch]=useState(false); const [collapsed,setCollapsed]=useState({});
 
-  const searchSets = async () => {
-    if (!q.trim()) return; setLoadingSet(true);
-    try { const r = await fetch(`${API}/sets?q=name:"${encodeURIComponent(q.trim())}"&pageSize=10`); const d = await r.json(); setSetResults(d.data||[]); } catch { setSetResults([]); }
-    setLoadingSet(false);
-  };
+  const searchSets=async()=>{ if (!q.trim()) return; setLoadingSet(true); try{ const r=await fetch(`${API}/sets?q=name:"${encodeURIComponent(q.trim())}"&pageSize=10`); const d=await r.json(); setSetResults(d.data||[]); } catch{ setSetResults([]); } setLoadingSet(false); };
 
-  const addSet = async (set) => {
-    if (masterSets.find(s=>s.id===set.id)) { setShowSearch(false); setActive(set.id); return; }
+  const addSet=async(set)=>{
+    if (masterSets.find(s=>s.id===set.id)){setShowSearch(false);setActive(set.id);return;}
     setLoadingCards(true);
     try {
       let all=[],page=1,total=999;
-      while (all.length<total) {
-        const r = await fetch(`${API}/cards?q=set.id:${set.id}&pageSize=250&page=${page}`);
-        const d = await r.json(); total=d.totalCount; all=[...all,...(d.data||[])];
-        if (!(d.data||[]).length) break; page++;
-      }
+      while (all.length<total){ const r=await fetch(`${API}/cards?q=set.id:${set.id}&pageSize=250&page=${page}`); const d=await r.json(); total=d.totalCount; all=[...all,...(d.data||[])]; if (!(d.data||[]).length) break; page++; }
       all.sort((a,b)=>(parseInt(a.number)||0)-(parseInt(b.number)||0));
-      const entries = [];
-      all.forEach(card => {
-        getAllVariants(card, set.id).forEach(v => {
-          entries.push({ id:vid(card.id,v.key), cardId:card.id, card, variantKey:v.key, variantLabel:v.label, price:v.price, isSynth:v.isSynth });
-        });
-      });
+      const entries=[];
+      all.forEach(card=>{ getAllVariants(card,set.id).forEach(v=>{ entries.push({id:vid(card.id,v.key),cardId:card.id,card,variantKey:v.key,variantLabel:v.label,price:v.price,isSynth:v.isSynth}); }); });
       setMasterSets(prev=>[...prev,{id:set.id,name:set.name,logo:set.images?.logo,entries,checked:{}}]);
       setActive(set.id);
-    } catch(e) { console.error(e); }
+    } catch(e){ console.error(e); }
     setLoadingCards(false); setShowSearch(false); setSetResults([]); setQ("");
   };
 
-  const toggleEntry = (setId,entryId) => setMasterSets(prev=>prev.map(s=>s.id===setId?{...s,checked:{...s.checked,[entryId]:!s.checked[entryId]}}:s));
-  const removeSet = id => { setMasterSets(prev=>prev.filter(s=>s.id!==id)); if (active===id) setActive(null); };
-  const cur = masterSets.find(s=>s.id===active);
+  const toggleEntry=(setId,entryId)=>setMasterSets(prev=>prev.map(s=>s.id===setId?{...s,checked:{...s.checked,[entryId]:!s.checked[entryId]}}:s));
+  const removeSet=id=>{ setMasterSets(prev=>prev.filter(s=>s.id!==id)); if (active===id) setActive(null); };
+  const cur=masterSets.find(s=>s.id===active);
 
   return (
     <div>
       <div className="pill-wrap">
-        {masterSets.map(s => { const owned=Object.values(s.checked).filter(Boolean).length; const tot=(s.entries||[]).length; return (
-          <span key={s.id} className={`pill${active===s.id?" active":""}`} onClick={()=>setActive(s.id)}>
-            {s.name} <span style={{fontSize:11,opacity:0.7,marginLeft:4}}>({owned}/{tot})</span>
-          </span>
-        ); })}
-        <button onClick={()=>setShowSearch(!showSearch)}>+ Add Set</button>
+        {masterSets.map(s=>{ const owned=Object.values(s.checked).filter(Boolean).length; const tot=(s.entries||[]).length; return (
+          <span key={s.id} className={`pill${active===s.id?" pill-blue":""}`} onClick={()=>setActive(s.id)}>{s.name}<span style={{fontSize:11,opacity:0.6,marginLeft:4}}>({owned}/{tot})</span></span>
+        );})}
+        <button className="btn-blue small-btn" onClick={()=>setShowSearch(!showSearch)}>+ Add Set</button>
       </div>
 
-      {showSearch && (
+      {showSearch&&(
         <div className="search-box">
           <div className="flex-gap" style={{marginBottom:12}}>
-            <input type="text" value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>e.key==="Enter"&&searchSets()} placeholder="Search Pokémon sets..." />
-            <button onClick={searchSets}>Search</button>
+            <input type="text" value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>e.key==="Enter"&&searchSets()} placeholder="Search Pokémon sets..."/>
+            <button className="btn-blue" onClick={searchSets}>Search</button>
             <button onClick={()=>{setShowSearch(false);setSetResults([]);}}>Cancel</button>
           </div>
-          {loadingSet && <div style={{fontSize:14,color:"var(--text2)"}}>Searching...</div>}
-          {loadingCards && <div style={{fontSize:14,color:"var(--text2)"}}>Loading cards and variants…</div>}
-          {setResults.map(s => (
+          {loadingSet&&<div style={{fontSize:14,color:"var(--text2)"}}>Searching...</div>}
+          {loadingCards&&<div style={{fontSize:14,color:"var(--text2)"}}>Loading cards and variants…</div>}
+          {setResults.map(s=>(
             <div key={s.id} className="card-item">
-              {s.images?.logo && <img src={s.images.logo} alt={s.name} style={{height:26,width:"auto",objectFit:"contain",flexShrink:0}} />}
+              {s.images?.logo&&<img src={s.images.logo} alt={s.name} style={{height:26,width:"auto",objectFit:"contain",flexShrink:0}}/>}
               <div style={{flex:1}}><div className="card-name" style={{fontSize:13}}>{s.name}</div><div className="card-sub">{s.series} · {s.printedTotal||s.total||"?"} cards</div></div>
-              <button className="small-btn" onClick={()=>addSet(s)}>Add</button>
+              <button className="small-btn btn-blue" onClick={()=>addSet(s)}>Add</button>
             </div>
           ))}
         </div>
       )}
 
-      {cur && (() => {
-      const owned=Object.values(cur.checked).filter(Boolean).length;
+      {cur&&(()=>{
+        const owned=Object.values(cur.checked).filter(Boolean).length;
         const total=(cur.entries||[]).length;
         const pct=total?Math.round(owned/total*100):0;
         const remaining=total-owned;
@@ -384,181 +352,171 @@ function MasterSetsTab({ masterSets, setMasterSets }) {
         const isOpen=!collapsed[cur.id];
         return (
           <div>
-            <div style={{background:"var(--bg)",border:"0.5px solid var(--border)",borderRadius:"var(--radius-lg)",padding:"14px 16px",marginBottom:10}}>
-              <div style={{display:"flex",gap:14,alignItems:"flex-start",marginBottom:10}}>
-                {cur.logo && <img src={cur.logo} alt={cur.name} style={{height:48,objectFit:"contain",flexShrink:0}} />}
+            <div className="glass-card set-card">
+              <div className="set-top">
+                {cur.logo&&<img src={cur.logo} alt={cur.name} style={{height:48,objectFit:"contain",flexShrink:0}}/>}
                 <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontWeight:500,fontSize:16,marginBottom:2}}>{cur.name}</div>
-                  <div style={{fontSize:12,color:"var(--text2)",marginBottom:4}}>{owned} / {total} cards collected ({pct}%)</div>
-                  <div style={{height:6,background:"var(--bg3)",borderRadius:3,overflow:"hidden"}}>
-                    <div style={{height:"100%",width:`${pct}%`,background:"var(--success-bar)",borderRadius:3,transition:"width 0.3s"}} />
-                  </div>
+                  <div className="set-name">{cur.name}</div>
+                  <div className="set-sub">{owned} / {total} cards collected ({pct}%)</div>
+                  <div className="progress-track"><div className="progress-fill" style={{width:`${pct}%`}}/></div>
                 </div>
-                <button className="small-btn danger-btn" style={{flexShrink:0}} onClick={()=>removeSet(cur.id)}>Remove</button>
+                <button className="small-btn btn-red" style={{flexShrink:0}} onClick={()=>removeSet(cur.id)}>Remove</button>
               </div>
-              <div className="set-stats">
-                <div className="set-stat"><div className="set-stat-label">Cards remaining</div><div className="set-stat-val">{remaining}</div></div>
-                <div className="set-stat"><div className="set-stat-label">Completion</div><div className="set-stat-val">{pct}%</div></div>
-                <div className="set-stat"><div className="set-stat-label">Owned value</div><div className="set-stat-val">{fmt(ownedVal)||"$0.00"}</div></div>
-                <div className="set-stat"><div className="set-stat-label">Remaining cost</div><div className="set-stat-val">{fmt(remainVal)||"$0.00"}</div></div>
+              <div className="stat-grid">
+                <div className="stat-tile"><div className="stat-lbl">Cards remaining</div><div className="stat-val">{remaining}</div></div>
+                <div className="stat-tile"><div className="stat-lbl">Completion</div><div className="stat-val">{pct}%</div></div>
+                <div className="stat-tile"><div className="stat-lbl">Owned value</div><div className="stat-val">{fmt(ownedVal)||"$0.00"}</div></div>
+                <div className="stat-tile"><div className="stat-lbl">Remaining cost</div><div className="stat-val">{fmt(remainVal)||"$0.00"}</div></div>
               </div>
             </div>
             <button className="small-btn" style={{marginBottom:8}} onClick={()=>setCollapsed(p=>({...p,[cur.id]:!p[cur.id]}))}>
               {isOpen?"▼ Hide cards":"▶ Show cards"}
             </button>
-            <div className={`collapsible-body${isOpen?" open":" closed"}`}>
+            <div className={`collapsible${isOpen?" open":" closed"}`}>
               <div className="scrollable">
-                {groupByCard(cur.entries||[]).map(g => (
+                {groupByCard(cur.entries||[]).map(g=>(
                   <CardGroup key={g.cardId} card={g.card} variants={g.variants} renderVariant={e=>(
-                    <VariantPill key={e.id} label={e.variantLabel} price={e.price} isSynth={!!e.isSynth}
-                      checked={!!cur.checked[e.id]} onToggle={()=>toggleEntry(cur.id,e.id)} />
-                  )} />
+                    <VariantPill key={e.id} label={e.variantLabel} price={e.price} isSynth={!!e.isSynth} checked={!!cur.checked[e.id]} onToggle={()=>toggleEntry(cur.id,e.id)}/>
+                  )}/>
                 ))}
               </div>
             </div>
           </div>
         );
       })()}
-      {!cur && masterSets.length>0 && <div className="empty">Select a set above.</div>}
-      {!masterSets.length && !showSearch && <div className="empty">No master sets yet. Click "+ Add Set" to begin.</div>}
+      {!cur&&masterSets.length>0&&<div className="empty">Select a set above.</div>}
+      {!masterSets.length&&!showSearch&&<div className="empty">No master sets yet. Click "+ Add Set" to begin.</div>}
     </div>
   );
 }
 
-// ─── BuyListTab ───────────────────────────────────────────────────────────────
-function BuyListTab({ wishlists, masterSets, setMasterSets }) {
-  const [collapsed,setCollapsed] = useState({});
-  const toggleSec = id => setCollapsed(p=>({...p,[id]:!p[id]}));
-  const sections = [];
-  masterSets.forEach(s => { const needed=(s.entries||[]).filter(e=>!s.checked[e.id]); if (needed.length) sections.push({id:s.id,name:s.name,logo:s.logo,entries:needed,type:"master"}); });
-  wishlists.forEach(l => { if ((l.entries||[]).length) sections.push({id:l.id,name:l.name,logo:null,entries:l.entries,type:"wishlist"}); });
-  const grand = sections.reduce((t,s)=>t+s.entries.reduce((st,e)=>st+(e.price||0),0),0);
+function BuyListTab({wishlists,masterSets,setMasterSets}) {
+  const [collapsed,setCollapsed]=useState({});
+  const toggle=id=>setCollapsed(p=>({...p,[id]:!p[id]}));
+  const sections=[];
+  masterSets.forEach(s=>{ const needed=(s.entries||[]).filter(e=>!s.checked[e.id]); if (needed.length) sections.push({id:s.id,name:s.name,logo:s.logo,entries:needed,type:"master"}); });
+  wishlists.forEach(l=>{ if ((l.entries||[]).length) sections.push({id:l.id,name:l.name,logo:null,entries:l.entries,type:"wishlist"}); });
+  const grand=sections.reduce((t,s)=>t+s.entries.reduce((st,e)=>st+(e.price||0),0),0);
   if (!sections.length) return <div className="empty">Your buy list is empty.</div>;
   return (
     <div>
       <div className="grand-total">
-        <div><div className="total-label">Estimated total</div><div className="total-val">{fmt(grand)||"$0.00"}</div></div>
-        <div style={{textAlign:"right"}}><div className="total-label">Items needed</div><div className="total-val">{sections.reduce((t,s)=>t+s.entries.length,0)}</div></div>
+        <div><div className="total-lbl">Estimated total</div><div className="total-val">{fmt(grand)||"$0.00"}</div></div>
+        <div style={{textAlign:"right"}}><div className="total-lbl">Items needed</div><div className="total-val">{sections.reduce((t,s)=>t+s.entries.length,0)}</div></div>
       </div>
-      {sections.map(sec => {
-        const sub=sec.entries.reduce((t,e)=>t+(e.price||0),0); const isOpen=!collapsed[sec.id];
-        return (
-          <div key={sec.id} style={{marginBottom:10}}>
-            <div className="section-header" onClick={()=>toggleSec(sec.id)}>
-              {sec.logo && <img src={sec.logo} alt={sec.name} style={{height:20,objectFit:"contain",flexShrink:0}} />}
-              {!sec.logo && <span className="wishlist-tag">wishlist</span>}
-              <span className="section-name">{sec.name}</span>
-              <span className="section-meta">{sec.entries.length} · {fmt(sub)||"$0.00"}</span>
-              <span className={`chevron${isOpen?" open":""}`}>▼</span>
-            </div>
-            {isOpen && (sec.type==="wishlist"
-              ? sec.entries.map(e => (
-                  <div key={e.uid} className="card-item">
-                    {e.card.images?.small && <img src={e.card.images.small} alt={e.card.name} loading="lazy" />}
-                    <div style={{flex:1,minWidth:0}}><div className="card-name">{e.card.name}</div><div className="card-sub">{e.card.set?.name}</div><span className="variant-tag">{e.variantLabel}</span></div>
-                    <div className="card-price">{e.price!=null?fmt(e.price):"N/A"}</div>
-                  </div>
-                ))
-              : groupByCard(sec.entries).map(g => (
-                  <CardGroup key={g.cardId} card={g.card} variants={g.variants} renderVariant={e=>(
-                    <VariantPill key={e.id} label={e.variantLabel} price={e.price} isSynth={!!e.isSynth} checked={false}
-                      onToggle={()=>setMasterSets(prev=>prev.map(s=>s.id===sec.id?{...s,checked:{...s.checked,[e.id]:true}}:s))} />
-                  )} />
-                ))
-            )}
+      {sections.map(sec=>{ const sub=sec.entries.reduce((t,e)=>t+(e.price||0),0); const isOpen=!collapsed[sec.id]; return (
+        <div key={sec.id} style={{marginBottom:10}}>
+          <div className="sec-hdr" onClick={()=>toggle(sec.id)}>
+            {sec.logo&&<img src={sec.logo} alt={sec.name} style={{height:20,objectFit:"contain",flexShrink:0}}/>}
+            {!sec.logo&&<span className="wishlist-tag">wishlist</span>}
+            <span className="sec-name">{sec.name}</span>
+            <span className="sec-meta">{sec.entries.length} · {fmt(sub)||"$0.00"}</span>
+            <span className={`chevron${isOpen?" open":""}`}>▼</span>
           </div>
-        );
-      })}
+          <div className={`collapsible${isOpen?" open":" closed"}`}>
+            {sec.type==="wishlist"
+              ?sec.entries.map(e=>(
+                <div key={e.uid} className="card-item">
+                  {e.card.images?.small&&<img src={e.card.images.small} alt={e.card.name} loading="lazy"/>}
+                  <div style={{flex:1,minWidth:0}}><div className="card-name">{e.card.name}</div><div className="card-sub">{e.card.set?.name}</div><span className="variant-tag">{e.variantLabel}</span></div>
+                  <div className="card-price">{e.price!=null?fmt(e.price):<span className="no-price-badge">no price</span>}</div>
+                </div>
+              ))
+              :groupByCard(sec.entries).map(g=>(
+                <CardGroup key={g.cardId} card={g.card} variants={g.variants} renderVariant={e=>(
+                  <VariantPill key={e.id} label={e.variantLabel} price={e.price} isSynth={!!e.isSynth} checked={false}
+                    onToggle={()=>setMasterSets(prev=>prev.map(s=>s.id===sec.id?{...s,checked:{...s.checked,[e.id]:true}}:s))}/>
+                )}/>
+              ))
+            }
+          </div>
+        </div>
+      );})}
     </div>
   );
 }
 
-// ─── StatsTab ─────────────────────────────────────────────────────────────────
-function StatsTab({ wishlists, masterSets }) {
+function StatsTab({wishlists,masterSets}) {
   const totalOwned=masterSets.reduce((t,s)=>t+Object.values(s.checked).filter(Boolean).length,0);
   const totalNeeded=masterSets.reduce((t,s)=>t+(s.entries||[]).filter(e=>!s.checked[e.id]).length,0);
   const wTotal=wishlists.reduce((t,l)=>t+(l.entries||[]).length,0);
-  const buyVal=masterSets.reduce((t,s)=>t+(s.entries||[]).filter(e=>!s.checked[e.id]).reduce((st,e)=>st+(e.price||0),0),0)
-    +wishlists.reduce((t,l)=>t+(l.entries||[]).reduce((st,e)=>st+(e.price||0),0),0);
+  const buyVal=masterSets.reduce((t,s)=>t+(s.entries||[]).filter(e=>!s.checked[e.id]).reduce((st,e)=>st+(e.price||0),0),0)+wishlists.reduce((t,l)=>t+(l.entries||[]).reduce((st,e)=>st+(e.price||0),0),0);
   return (
     <div>
-      <div className="stat-grid">
+      <div className="stat-card-grid">
         {[["Variants owned",totalOwned],["Variants needed",totalNeeded],["Wishlist entries",wTotal],["Est. buy list value",fmt(buyVal)||"$0.00"]].map(([l,v])=>(
-          <div key={l} className="stat-card"><div className="stat-label">{l}</div><div className="stat-val">{v}</div></div>
+          <div key={l} className="stat-card"><div className="stat-card-lbl">{l}</div><div className="stat-card-val">{v}</div></div>
         ))}
       </div>
-      {masterSets.length>0 && (
+      {masterSets.length>0&&(
         <div>
-          <h3 style={{marginBottom:12}}>Master set progress</h3>
-          {masterSets.map(s => { const owned=Object.values(s.checked).filter(Boolean).length; const total=(s.entries||[]).length; const pct=total?Math.round(owned/total*100):0; return (
-            <div key={s.id} style={{marginBottom:12}}>
+          <h3 style={{fontSize:15,fontWeight:500,marginBottom:12}}>Master set progress</h3>
+          {masterSets.map(s=>{ const owned=Object.values(s.checked).filter(Boolean).length; const total=(s.entries||[]).length; const pct=total?Math.round(owned/total*100):0; return (
+            <div key={s.id} style={{marginBottom:14}}>
               <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:13}}>{s.name}</span><span style={{fontSize:13,color:"var(--text2)"}}>{owned}/{total} ({pct}%)</span></div>
-              <div className="progress-bar"><div className="progress-fill" style={{width:`${pct}%`}} /></div>
+              <div className="progress-track"><div className="progress-fill" style={{width:`${pct}%`}}/></div>
             </div>
-          ); })}
+          );})}
         </div>
       )}
-      {wishlists.length>0 && (
+      {wishlists.length>0&&(
         <div style={{marginTop:20}}>
-          <h3 style={{marginBottom:12}}>Wishlists</h3>
-          {wishlists.map(l => { const val=(l.entries||[]).reduce((t,e)=>t+(e.price||0),0); return (
-            <div key={l.id} style={{display:"flex",justifyContent:"space-between",padding:"8px 12px",background:"var(--bg2)",borderRadius:8,marginBottom:6,border:"0.5px solid var(--border)"}}>
+          <h3 style={{fontSize:15,fontWeight:500,marginBottom:12}}>Wishlists</h3>
+          {wishlists.map(l=>{ const val=(l.entries||[]).reduce((t,e)=>t+(e.price||0),0); return (
+            <div key={l.id} style={{display:"flex",justifyContent:"space-between",padding:"9px 12px",background:"var(--glass)",borderRadius:"var(--radius)",marginBottom:6,border:"0.5px solid var(--border)"}}>
               <span style={{fontSize:13}}>{l.name}</span>
               <span style={{fontSize:13,color:"var(--text2)"}}>{(l.entries||[]).length} entries · {fmt(val)||"$0.00"}</span>
             </div>
-          ); })}
+          );})}
         </div>
       )}
-      {!masterSets.length && !wishlists.length && <div className="empty">No data yet.</div>}
+      {!masterSets.length&&!wishlists.length&&<div className="empty">No data yet.</div>}
     </div>
   );
 }
 
-// ─── App ──────────────────────────────────────────────────────────────────────
-const TABS = ["Wishlists","Master Sets","Buy List","Stats"];
+const TABS=["Wishlists","Master Sets","Buy List","Stats"];
 
 function App() {
-  const [tab,setTab] = useState(0);
-  const [ready,setReady] = useState(false);
-  const [wishlists,setWRaw] = useState(()=>lstore("pkm_wishlists2",[]));
-  const [masterSets,setMRaw] = useState(()=>lstore("pkm_mastersets2",[]));
-  const setWishlists = v => { const n=typeof v==="function"?v(wishlists):v; setWRaw(n); sstore("pkm_wishlists2",n); };
-  const setMasterSets = v => { const n=typeof v==="function"?v(masterSets):v; setMRaw(n); sstore("pkm_mastersets2",n); };
+  const [tab,setTab]=useState(0);
+  const [ready,setReady]=useState(false);
+  const [wishlists,setWRaw]=useState(()=>lstore("pkm_wishlists2",[]));
+  const [masterSets,setMRaw]=useState(()=>lstore("pkm_mastersets2",[]));
+  const setWishlists=v=>{ const n=typeof v==="function"?v(wishlists):v; setWRaw(n); sstore("pkm_wishlists2",n); };
+  const setMasterSets=v=>{ const n=typeof v==="function"?v(masterSets):v; setMRaw(n); sstore("pkm_mastersets2",n); };
 
   useEffect(()=>{ loadVariantsData().then(()=>setReady(true)); },[]);
 
-  if (!ready) return <div style={{padding:40,textAlign:"center",color:"var(--text2)",fontSize:14}}>Loading...</div>;
+  if (!ready) return <div style={{padding:60,textAlign:"center",color:"var(--text2)",fontSize:14}}>Loading...</div>;
+
+  const activeClass = tab===2 ? "active-red" : "active-blue";
 
   return (
     <div>
-      <div className="header">
-        <div className="logo-circle">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="#185fa5" strokeWidth="1.5"/>
-            <line x1="2" y1="12" x2="22" y2="12" stroke="#185fa5" strokeWidth="1.5"/>
-            <circle cx="12" cy="12" r="3" fill="#185fa5"/>
-          </svg>
+      <div className="app-header">
+        <div className="header-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#a8a6ff" strokeWidth="1.5"/><line x1="2" y1="12" x2="22" y2="12" stroke="#a8a6ff" strokeWidth="1.5"/><circle cx="12" cy="12" r="3" fill="#a8a6ff"/></svg>
         </div>
         <h1>Pokémon Card Tracker</h1>
       </div>
       <div className="tab-bar">
         {TABS.map((t,i)=>(
-          <button key={t} className={`tab-btn${tab===i?" active":""}`} onClick={()=>setTab(i)}>
+          <button key={t} className={`tab-btn${tab===i?" "+activeClass:""}`} onClick={()=>setTab(i)}>
             {t}
             {t==="Wishlists"&&wishlists.length>0&&<span className="badge">{wishlists.length}</span>}
             {t==="Master Sets"&&masterSets.length>0&&<span className="badge">{masterSets.length}</span>}
           </button>
         ))}
       </div>
-      {tab===0 && <WishlistsTab wishlists={wishlists} setWishlists={setWishlists} />}
-      {tab===1 && <MasterSetsTab masterSets={masterSets} setMasterSets={setMasterSets} />}
-      {tab===2 && <BuyListTab wishlists={wishlists} masterSets={masterSets} setMasterSets={setMasterSets} />}
-      {tab===3 && <StatsTab wishlists={wishlists} masterSets={masterSets} />}
+      {tab===0&&<WishlistsTab wishlists={wishlists} setWishlists={setWishlists}/>}
+      {tab===1&&<MasterSetsTab masterSets={masterSets} setMasterSets={setMasterSets}/>}
+      {tab===2&&<BuyListTab wishlists={wishlists} masterSets={masterSets} setMasterSets={setMasterSets}/>}
+      {tab===3&&<StatsTab wishlists={wishlists} masterSets={masterSets}/>}
     </div>
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
