@@ -43,7 +43,9 @@
   .pill.active { background: var(--info-bg); color: var(--info-text); border-color: var(--info-border); font-weight: 500; }
   .pill-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
   .row { display: flex; align-items: center; gap: 10px; }
-  .card-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--bg2); border-radius: var(--radius); border: 0.5px solid var(--border); margin-bottom: 4px; }
+  .card-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--bg2); border-radius: var(--radius); border: 0.5px solid var(--border); margin-bottom: 4px; transition: background 0.15s, border-color 0.15s; }
+  .card-item.variant-row:hover { background: var(--info-bg); border-color: var(--info-border); }
+  .card-item.variant-row:hover span { color: var(--info-text); }
   .card-item img { width: 36px; height: 50px; object-fit: contain; border-radius: 3px; flex-shrink: 0; }
   .card-name { font-weight: 500; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .card-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
@@ -99,21 +101,29 @@ const VARIANT_LABELS = {
   unlimitedHolofoil: "Unlimited Holofoil",
 };
 
-// Priority order for variant display
+// Preferred display order — unknown keys appended after
 const VARIANT_ORDER = ["normal","holofoil","reverseHolofoil","pokeBallReverseHolofoil","masterBallReverseHolofoil","1stEditionNormal","1stEditionHolofoil","unlimitedHolofoil"];
+
+function labelFromKey(key) {
+  if (VARIANT_LABELS[key]) return VARIANT_LABELS[key];
+  // Convert camelCase to readable: "pokeBallReverseHolofoil" -> "Poke Ball Reverse Holofoil"
+  return key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()).trim();
+}
 
 function getVariants(card) {
   const prices = card.tcgplayer?.prices || {};
   const keys = Object.keys(prices);
   if (!keys.length) return [{ key: "normal", label: "Normal", price: null }];
-  return VARIANT_ORDER
-    .filter(k => keys.includes(k))
-    .concat(keys.filter(k => !VARIANT_ORDER.includes(k)))
-    .map(k => ({
-      key: k,
-      label: VARIANT_LABELS[k] || k,
-      price: prices[k]?.market ?? prices[k]?.mid ?? null,
-    }));
+  // Sort: known order first, then any unknown keys alphabetically
+  const sorted = [
+    ...VARIANT_ORDER.filter(k => keys.includes(k)),
+    ...keys.filter(k => !VARIANT_ORDER.includes(k)).sort(),
+  ];
+  return sorted.map(k => ({
+    key: k,
+    label: labelFromKey(k),
+    price: prices[k]?.market ?? prices[k]?.mid ?? null,
+  }));
 }
 
 function variantId(cardId, variantKey) { return `${cardId}__${variantKey}`; }
@@ -305,6 +315,25 @@ function MasterSetsTab({ masterSets, setMasterSets }) {
         page++;
       }
       all.sort((a,b)=>(parseInt(a.number)||0)-(parseInt(b.number)||0));
+      // For cards with only 1 variant from bulk fetch, re-fetch individually to get full price data
+      const needsRefetch = all.filter(c => Object.keys(c.tcgplayer?.prices||{}).length <= 1);
+      if (needsRefetch.length > 0) {
+        const chunks = [];
+        for (let i=0; i<needsRefetch.length; i+=20) chunks.push(needsRefetch.slice(i,i+20));
+        for (const chunk of chunks) {
+          const ids = chunk.map(c=>c.id).join(',');
+          try {
+            const r = await fetch(`${API}/cards?q=id:(${ids.replace(/,/g,' OR ')})&pageSize=20`);
+            const d = await r.json();
+            if (d.data) {
+              d.data.forEach(fresh => {
+                const idx = all.findIndex(c=>c.id===fresh.id);
+                if (idx !== -1) all[idx] = fresh;
+              });
+            }
+          } catch {}
+        }
+      }
       // Expand cards into variants
       const entries = [];
       all.forEach(card => {
@@ -358,7 +387,7 @@ function MasterSetsTab({ masterSets, setMasterSets }) {
             <button onClick={()=>{setShowSearch(false);setSetResults([]);}}>Cancel</button>
           </div>
           {loadingSet && <div style={{fontSize:14,color:"var(--text2)"}}>Searching...</div>}
-          {loadingCards && <div style={{fontSize:14,color:"var(--text2)"}}>Loading all cards and variants... this may take a moment.</div>}
+          {loadingCards && <div style={{fontSize:14,color:"var(--text2)"}}>Loading cards and variant data... larger sets may take 15–30 seconds.</div>}
           {setResults.map(s=>(
             <div key={s.id} className="card-item">
               {s.images?.logo && <img src={s.images.logo} alt={s.name} style={{height:26,width:"auto",objectFit:"contain",flexShrink:0}} />}
@@ -405,7 +434,7 @@ function MasterSetsTab({ masterSets, setMasterSets }) {
                     </div>
                     <div style={{paddingLeft:38}}>
                       {g.variants.map(e=>(
-                        <div key={e.id} className="card-item" style={{marginBottom:3,padding:"5px 8px"}}>
+                        <div key={e.id} className="card-item variant-row" style={{marginBottom:3,padding:"5px 8px"}}>
                           <input type="checkbox" checked={!!cur.checked[e.id]} onChange={ev=>toggle(cur.id,e.id,ev.target.checked)} />
                           <span style={{flex:1,fontSize:12,color:"var(--text2)"}}>{e.variantLabel}</span>
                           <span className="card-price" style={{fontSize:12}}>{e.price!=null?fmt(e.price):<span className="no-price">—</span>}</span>
@@ -486,7 +515,7 @@ function BuyListTab({ wishlists, masterSets, setMasterSets }) {
                   </div>
                   <div style={{paddingLeft:38}}>
                     {g.variants.map(e=>(
-                      <div key={e.id} className="card-item" style={{marginBottom:3,padding:"5px 8px"}}>
+                      <div key={e.id} className="card-item variant-row" style={{marginBottom:3,padding:"5px 8px"}}>
                         <input type="checkbox" checked={false} onChange={ev=>{
                           if(ev.target.checked) setMasterSets(prev=>prev.map(s=>s.id===sec.id?{...s,checked:{...s.checked,[e.id]:true}}:s));
                         }} />
