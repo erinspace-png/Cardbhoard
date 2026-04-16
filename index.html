@@ -14,7 +14,7 @@
     --text: #1a1a18; --text2: #6b6b67; --text3: #9b9b97;
     --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.22);
     --info-bg: #e6f1fb; --info-text: #185fa5; --info-border: #85b7eb;
-    --success-bg: #eaf3de; --success-bar: #639922;
+    --success-bar: #639922;
     --danger-text: #a32d2d;
     --radius: 8px; --radius-lg: 12px;
   }
@@ -24,7 +24,7 @@
       --text: #f0f0ee; --text2: #a0a09c; --text3: #6b6b67;
       --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
       --info-bg: #0c447c; --info-text: #b5d4f4; --info-border: #378add;
-      --success-bg: #27500a; --success-bar: #97c459;
+      --success-bar: #97c459;
       --danger-text: #f09595;
     }
   }
@@ -43,15 +43,12 @@
   .pill.active { background: var(--info-bg); color: var(--info-text); border-color: var(--info-border); font-weight: 500; }
   .pill-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
   .row { display: flex; align-items: center; gap: 10px; }
-  .card-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--bg2); border-radius: var(--radius); border: 0.5px solid var(--border); margin-bottom: 4px; transition: background 0.15s, border-color 0.15s; }
-  .card-item.variant-row:hover { background: var(--info-bg); border-color: var(--info-border); }
-  .card-item.variant-row:hover span { color: var(--info-text); }
+  .card-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--bg2); border-radius: var(--radius); border: 0.5px solid var(--border); margin-bottom: 4px; }
   .card-item img { width: 36px; height: 50px; object-fit: contain; border-radius: 3px; flex-shrink: 0; }
   .card-name { font-weight: 500; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .card-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
   .variant-tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 8px; margin-top: 2px; background: var(--bg3); color: var(--text2); border: 0.5px solid var(--border); }
   .card-price { font-size: 13px; font-weight: 500; text-align: right; flex-shrink: 0; }
-  .no-price { font-size: 11px; color: var(--text3); }
   .remove-btn { font-size: 11px; color: var(--danger-text); background: none; border: none; cursor: pointer; padding: 2px 0; display: block; margin-top: 2px; }
   .tab-bar { display: flex; gap: 2px; border-bottom: 0.5px solid var(--border); margin-bottom: 20px; }
   .tab-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 9px 14px; font-size: 13px; color: var(--text2); cursor: pointer; border-radius: 0; margin-bottom: -1px; }
@@ -81,88 +78,134 @@
   .danger-btn { color: var(--danger-text); }
   .small-btn { font-size: 12px; padding: 4px 10px; }
   .wishlist-tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--info-bg); color: var(--info-text); flex-shrink: 0; }
-  .group-header { font-size: 12px; color: var(--text3); padding: 6px 4px 2px; font-weight: 500; letter-spacing: 0.03em; }
+  /* Variant row pill — fully clickable */
+  .variant-pill {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 10px; border-radius: var(--radius);
+    background: var(--bg2); border: 0.5px solid var(--border);
+    margin-bottom: 3px; cursor: pointer; user-select: none;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .variant-pill:hover { background: var(--info-bg); border-color: var(--info-border); }
+  .variant-pill:hover .vp-label { color: var(--info-text); }
+  .variant-pill:hover .vp-price { color: var(--info-text); }
+  .variant-pill.checked { background: var(--info-bg); border-color: var(--info-border); opacity: 0.6; }
+  .variant-pill.checked .vp-label { color: var(--info-text); text-decoration: line-through; }
+  .vp-label { flex: 1; font-size: 12px; color: var(--text2); }
+  .vp-price { font-size: 12px; font-weight: 500; color: var(--text); }
+  .synth-badge { font-size: 10px; padding: 1px 5px; border-radius: 6px; background: var(--bg3); color: var(--text3); border: 0.5px solid var(--border); margin-left: 4px; flex-shrink: 0; }
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script type="text/babel">
-const { useState, useEffect } = React;
+const { useState } = React;
 const API = "https://api.pokemontcg.io/v2";
+
+// ─── Variant rules per set ────────────────────────────────────────────────────
+// Rules applied AFTER API data is fetched; we synthesize extra rows
+// isSynth:true = we invented this row (no price, no separate image)
+// applicableTo: "all" | "pokemon" | "trainer"  (non-ex only unless noted)
+const SET_EXTRA_VARIANTS = {
+  // Prismatic Evolutions
+  "sv8pt5": [
+    { key: "pokeBallReverseHolofoil",    label: "Poke Ball Reverse Holo",   applicableTo: "all" },
+    { key: "masterBallReverseHolofoil",  label: "Master Ball Reverse Holo", applicableTo: "pokemon" },
+  ],
+  // Black Bolt
+  "sv105": [
+    { key: "pokeBallReverseHolofoil",    label: "Poke Ball Reverse Holo",   applicableTo: "all" },
+    { key: "masterBallReverseHolofoil",  label: "Master Ball Reverse Holo", applicableTo: "pokemon" },
+  ],
+  // White Flare
+  "sv106": [
+    { key: "pokeBallReverseHolofoil",    label: "Poke Ball Reverse Holo",   applicableTo: "all" },
+    { key: "masterBallReverseHolofoil",  label: "Master Ball Reverse Holo", applicableTo: "pokemon" },
+  ],
+  // Ascended Heroes — Energy reverse + Ball reverse (per-pokemon ball type not trackable via API)
+  "me2pt5": [
+    { key: "energyReverseHolofoil",  label: "Energy Reverse Holo", applicableTo: "all" },
+    { key: "ballReverseHolofoil",    label: "Ball Reverse Holo",   applicableTo: "all" },
+  ],
+};
 
 const VARIANT_LABELS = {
   normal: "Normal",
   holofoil: "Holofoil",
   reverseHolofoil: "Reverse Holofoil",
   masterBallReverseHolofoil: "Master Ball Reverse Holo",
-  pokeBallReverseHolofoil: "Poke Ball Reverse Holo",
+  pokeBallReverseHolofoil: "Poké Ball Reverse Holo",
+  energyReverseHolofoil: "Energy Reverse Holo",
+  ballReverseHolofoil: "Ball Reverse Holo",
   "1stEditionHolofoil": "1st Edition Holofoil",
   "1stEditionNormal": "1st Edition Normal",
   unlimitedHolofoil: "Unlimited Holofoil",
 };
 
-// Preferred display order — unknown keys appended after
-const VARIANT_ORDER = ["normal","holofoil","reverseHolofoil","pokeBallReverseHolofoil","masterBallReverseHolofoil","1stEditionNormal","1stEditionHolofoil","unlimitedHolofoil"];
+const VARIANT_ORDER = ["normal","holofoil","reverseHolofoil","pokeBallReverseHolofoil","masterBallReverseHolofoil","energyReverseHolofoil","ballReverseHolofoil","1stEditionNormal","1stEditionHolofoil","unlimitedHolofoil"];
 
-function labelFromKey(key) {
-  if (VARIANT_LABELS[key]) return VARIANT_LABELS[key];
-  // Convert camelCase to readable: "pokeBallReverseHolofoil" -> "Poke Ball Reverse Holofoil"
-  return key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()).trim();
+function labelFromKey(k) {
+  return VARIANT_LABELS[k] || k.replace(/([A-Z])/g,' $1').replace(/^./,s=>s.toUpperCase()).trim();
 }
 
-function getVariants(card) {
+function isExCard(card) {
+  const subtypes = card.subtypes || [];
+  const exTypes = ["EX","GX","V","VMAX","VSTAR","ex","Mega","BREAK","LEGEND","Prism Star","ACE SPEC","Radiant"];
+  return subtypes.some(s => exTypes.includes(s));
+}
+
+function isPokemon(card) { return card.supertype === "Pokémon"; }
+
+function getVariantsFromAPI(card) {
   const prices = card.tcgplayer?.prices || {};
   const keys = Object.keys(prices);
-  if (!keys.length) return [{ key: "normal", label: "Normal", price: null }];
-  // Sort: known order first, then any unknown keys alphabetically
-  const sorted = [
-    ...VARIANT_ORDER.filter(k => keys.includes(k)),
-    ...keys.filter(k => !VARIANT_ORDER.includes(k)).sort(),
-  ];
-  return sorted.map(k => ({
-    key: k,
-    label: labelFromKey(k),
-    price: prices[k]?.market ?? prices[k]?.mid ?? null,
-  }));
+  if (!keys.length) return [];
+  const sorted = [...VARIANT_ORDER.filter(k=>keys.includes(k)), ...keys.filter(k=>!VARIANT_ORDER.includes(k)).sort()];
+  return sorted.map(k => ({ key: k, label: labelFromKey(k), price: prices[k]?.market ?? prices[k]?.mid ?? null, isSynth: false }));
 }
 
-function variantId(cardId, variantKey) { return `${cardId}__${variantKey}`; }
+function getSynthVariants(card, setId) {
+  const rules = SET_EXTRA_VARIANTS[setId];
+  if (!rules || isExCard(card)) return [];
+  const apiKeys = Object.keys(card.tcgplayer?.prices || {});
+  return rules
+    .filter(r => {
+      if (apiKeys.includes(r.key)) return false; // already in API data
+      if (r.applicableTo === "pokemon" && !isPokemon(card)) return false;
+      return true;
+    })
+    .map(r => ({ key: r.key, label: r.label, price: null, isSynth: true }));
+}
 
-const lstore = (k, fb) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } };
-const sstore = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
-const fmt = n => n != null ? `$${Number(n).toFixed(2)}` : null;
+function getAllVariants(card, setId) {
+  const api = getVariantsFromAPI(card);
+  const synth = getSynthVariants(card, setId);
+  if (!api.length && !synth.length) return [{ key: "normal", label: "Normal", price: null, isSynth: false }];
+  return [...api, ...synth];
+}
 
-function CardItem({ card, variantKey, variantLabel, price, checked, onCheck, onRemove }) {
+const lstore = (k,fb) => { try { const v=localStorage.getItem(k); return v?JSON.parse(v):fb; } catch { return fb; } };
+const sstore = (k,v) => { try { localStorage.setItem(k,JSON.stringify(v)); } catch {} };
+const fmt = n => n!=null ? `$${Number(n).toFixed(2)}` : null;
+const vid = (cardId, vKey) => `${cardId}__${vKey}`;
+
+// ─── VariantPill — fully clickable row ────────────────────────────────────────
+function VariantPill({ label, price, isSynth, checked, onToggle }) {
   return (
-    <div className="card-item">
-      {onCheck !== undefined && <input type="checkbox" checked={!!checked} onChange={e => onCheck(e.target.checked)} />}
-      {card.images?.small && <img src={card.images.small} alt={card.name} loading="lazy" />}
-      <div style={{flex:1, minWidth:0}}>
-        <div className="card-name">{card.name}</div>
-        <div className="card-sub">{card.set?.name} · {card.rarity || "Unknown"}</div>
-        {variantLabel && <span className="variant-tag">{variantLabel}</span>}
-      </div>
-      <div className="card-price">
-        {price != null ? fmt(price) : <span className="no-price">No price</span>}
-        {onRemove && <button className="remove-btn" onClick={onRemove}>remove</button>}
-      </div>
+    <div className={`variant-pill${checked?" checked":""}`} onClick={onToggle}>
+      <input type="checkbox" checked={!!checked} onChange={()=>{}} onClick={e=>e.stopPropagation()} style={{pointerEvents:"none"}} />
+      <span className="vp-label">{label}{isSynth && <span className="synth-badge">no price</span>}</span>
+      <span className="vp-price">{price!=null ? fmt(price) : "N/A"}</span>
     </div>
   );
 }
 
+// ─── CardSearch ───────────────────────────────────────────────────────────────
 function CardSearch({ onAdd, placeholder }) {
-  const [q, setQ] = useState("");
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
+  const [q,setQ]=useState(""); const [results,setResults]=useState([]); const [loading,setLoading]=useState(false); const [searched,setSearched]=useState(false);
   const search = async () => {
-    if (!q.trim()) return;
-    setLoading(true); setSearched(true);
-    try {
-      const r = await fetch(`${API}/cards?q=name:"${encodeURIComponent(q.trim())}"&pageSize=20`);
-      const d = await r.json();
-      setResults(d.data || []);
-    } catch { setResults([]); }
+    if(!q.trim()) return; setLoading(true); setSearched(true);
+    try { const r=await fetch(`${API}/cards?q=name:"${encodeURIComponent(q.trim())}"&pageSize=20`); const d=await r.json(); setResults(d.data||[]); } catch { setResults([]); }
     setLoading(false);
   };
   return (
@@ -172,23 +215,20 @@ function CardSearch({ onAdd, placeholder }) {
         <button onClick={search} style={{flexShrink:0}}>Search</button>
       </div>
       {loading && <div className="empty" style={{padding:"10px 0"}}>Searching...</div>}
-      {searched && !loading && !results.length && <div className="empty" style={{padding:"10px 0"}}>No results found.</div>}
+      {searched&&!loading&&!results.length&&<div className="empty" style={{padding:"10px 0"}}>No results found.</div>}
       <div style={{maxHeight:340,overflowY:"auto"}}>
-        {results.map(card => {
-          const variants = getVariants(card);
+        {results.map(card=>{
+          const variants=getAllVariants(card, card.set?.id);
           return (
-            <div key={card.id} style={{marginBottom:8}}>
+            <div key={card.id} style={{marginBottom:10}}>
               <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
-                {card.images?.small && <img src={card.images.small} alt={card.name} style={{width:32,height:45,objectFit:"contain",borderRadius:3,flexShrink:0}} loading="lazy" />}
-                <div>
-                  <div className="card-name">{card.name}</div>
-                  <div className="card-sub">{card.set?.name} · {card.rarity||"Unknown"}</div>
-                </div>
+                {card.images?.small&&<img src={card.images.small} alt={card.name} style={{width:32,height:45,objectFit:"contain",borderRadius:3,flexShrink:0}} loading="lazy"/>}
+                <div><div className="card-name">{card.name}</div><div className="card-sub">{card.set?.name} · {card.rarity||"Unknown"}</div></div>
               </div>
               <div style={{paddingLeft:40,display:"flex",flexWrap:"wrap",gap:4}}>
-                {variants.map(v => (
-                  <button key={v.key} className="small-btn" onClick={()=>onAdd(card, v.key, v.label, v.price)} style={{fontSize:11}}>
-                    + {v.label} {v.price!=null ? `(${fmt(v.price)})` : ""}
+                {variants.map(v=>(
+                  <button key={v.key} className="small-btn" onClick={()=>onAdd(card,v.key,v.label,v.price)} style={{fontSize:11}}>
+                    + {v.label}{v.price!=null?` (${fmt(v.price)})`:""}
                   </button>
                 ))}
               </div>
@@ -200,32 +240,17 @@ function CardSearch({ onAdd, placeholder }) {
   );
 }
 
+// ─── WishlistsTab ─────────────────────────────────────────────────────────────
 function WishlistsTab({ wishlists, setWishlists }) {
-  const [active, setActive] = useState(null);
-  const [newName, setNewName] = useState("");
-  const [showCreate, setShowCreate] = useState(false);
-  const [showSearch, setShowSearch] = useState(false);
-  const [renaming, setRenaming] = useState(null);
-  const [renameVal, setRenameVal] = useState("");
-
-  const create = () => {
-    if (!newName.trim()) return;
-    const id = Date.now().toString();
-    setWishlists([...wishlists, {id, name:newName.trim(), entries:[]}]);
-    setNewName(""); setShowCreate(false); setActive(id);
-  };
-  const del = id => { setWishlists(wishlists.filter(l=>l.id!==id)); if(active===id) setActive(null); };
-  const addEntry = (listId, card, vKey, vLabel, price) => {
-    const entry = {uid: Date.now().toString(), card, variantKey:vKey, variantLabel:vLabel, price};
-    setWishlists(wishlists.map(l=>l.id===listId?{...l,entries:[...l.entries,entry]}:l));
-  };
-  const removeEntry = (listId, uid) => setWishlists(wishlists.map(l=>l.id===listId?{...l,entries:l.entries.filter(e=>e.uid!==uid)}:l));
-  const rename = id => { if(!renameVal.trim()) return; setWishlists(wishlists.map(l=>l.id===id?{...l,name:renameVal.trim()}:l)); setRenaming(null); };
-
-  const cur = wishlists.find(l=>l.id===active);
-  const entries = cur?.entries || [];
-  const total = entries.reduce((t,e)=>t+(e.price||0),0);
-
+  const [active,setActive]=useState(null); const [newName,setNewName]=useState(""); const [showCreate,setShowCreate]=useState(false);
+  const [showSearch,setShowSearch]=useState(false); const [renaming,setRenaming]=useState(null); const [renameVal,setRenameVal]=useState("");
+  const create=()=>{ if(!newName.trim()) return; const id=Date.now().toString(); setWishlists([...wishlists,{id,name:newName.trim(),entries:[]}]); setNewName(""); setShowCreate(false); setActive(id); };
+  const del=id=>{ setWishlists(wishlists.filter(l=>l.id!==id)); if(active===id) setActive(null); };
+  const addEntry=(listId,card,vKey,vLabel,price)=>{ const e={uid:Date.now().toString(),card,variantKey:vKey,variantLabel:vLabel,price}; setWishlists(wishlists.map(l=>l.id===listId?{...l,entries:[...l.entries,e]}:l)); };
+  const removeEntry=(listId,uid)=>setWishlists(wishlists.map(l=>l.id===listId?{...l,entries:l.entries.filter(e=>e.uid!==uid)}:l));
+  const rename=id=>{ if(!renameVal.trim()) return; setWishlists(wishlists.map(l=>l.id===id?{...l,name:renameVal.trim()}:l)); setRenaming(null); };
+  const cur=wishlists.find(l=>l.id===active); const entries=cur?.entries||[];
+  const total=entries.reduce((t,e)=>t+(e.price||0),0);
   return (
     <div>
       <div className="pill-wrap">
@@ -236,207 +261,114 @@ function WishlistsTab({ wishlists, setWishlists }) {
         ))}
         <button onClick={()=>setShowCreate(!showCreate)}>+ New List</button>
       </div>
-      {showCreate && (
-        <div className="flex-gap" style={{marginBottom:16}}>
-          <input type="text" value={newName} onChange={e=>setNewName(e.target.value)} onKeyDown={e=>e.key==="Enter"&&create()} placeholder="List name..." />
-          <button onClick={create}>Create</button>
-          <button onClick={()=>setShowCreate(false)}>Cancel</button>
-        </div>
-      )}
-      {cur && (
+      {showCreate&&(<div className="flex-gap" style={{marginBottom:16}}><input type="text" value={newName} onChange={e=>setNewName(e.target.value)} onKeyDown={e=>e.key==="Enter"&&create()} placeholder="List name..."/><button onClick={create}>Create</button><button onClick={()=>setShowCreate(false)}>Cancel</button></div>)}
+      {cur&&(
         <div>
           <div className="row" style={{marginBottom:12}}>
-            {renaming===cur.id ? (
-              <>
-                <input type="text" value={renameVal} onChange={e=>setRenameVal(e.target.value)} onKeyDown={e=>e.key==="Enter"&&rename(cur.id)} style={{maxWidth:200}} />
-                <button onClick={()=>rename(cur.id)}>Save</button>
-                <button onClick={()=>setRenaming(null)}>Cancel</button>
-              </>
-            ) : (
-              <>
-                <h3>{cur.name}</h3>
-                {entries.length>0 && <span style={{fontSize:13,color:"var(--text2)"}}>{fmt(total)}</span>}
-                <button className="small-btn" onClick={()=>{setRenaming(cur.id);setRenameVal(cur.name);}}>Rename</button>
-                <button className="small-btn danger-btn" onClick={()=>del(cur.id)}>Delete list</button>
-              </>
-            )}
-            <button onClick={()=>setShowSearch(!showSearch)} style={{marginLeft:"auto"}}>
-              {showSearch?"Hide search":"+ Add cards"}
-            </button>
+            {renaming===cur.id?(<><input type="text" value={renameVal} onChange={e=>setRenameVal(e.target.value)} onKeyDown={e=>e.key==="Enter"&&rename(cur.id)} style={{maxWidth:200}}/><button onClick={()=>rename(cur.id)}>Save</button><button onClick={()=>setRenaming(null)}>Cancel</button></>)
+            :(<><h3>{cur.name}</h3>{entries.length>0&&<span style={{fontSize:13,color:"var(--text2)"}}>{fmt(total)||"$0.00"}</span>}<button className="small-btn" onClick={()=>{setRenaming(cur.id);setRenameVal(cur.name);}}>Rename</button><button className="small-btn danger-btn" onClick={()=>del(cur.id)}>Delete list</button></>)}
+            <button onClick={()=>setShowSearch(!showSearch)} style={{marginLeft:"auto"}}>{showSearch?"Hide search":"+ Add cards"}</button>
           </div>
-          {showSearch && (
-            <div className="search-box">
-              <CardSearch onAdd={(card,vKey,vLabel,price)=>addEntry(cur.id,card,vKey,vLabel,price)} placeholder="Search for a card..." />
-            </div>
-          )}
-          {!entries.length && !showSearch && <div className="empty">No cards yet. Click "+ Add cards" to search.</div>}
+          {showSearch&&<div className="search-box"><CardSearch onAdd={(card,vKey,vLabel,price)=>addEntry(cur.id,card,vKey,vLabel,price)} placeholder="Search for a card..."/></div>}
+          {!entries.length&&!showSearch&&<div className="empty">No cards yet. Click "+ Add cards" to search.</div>}
           {entries.map(e=>(
-            <CardItem key={e.uid} card={e.card} variantKey={e.variantKey} variantLabel={e.variantLabel} price={e.price} onRemove={()=>removeEntry(cur.id,e.uid)} />
+            <div key={e.uid} className="card-item">
+              {e.card.images?.small&&<img src={e.card.images.small} alt={e.card.name} loading="lazy"/>}
+              <div style={{flex:1,minWidth:0}}>
+                <div className="card-name">{e.card.name}</div>
+                <div className="card-sub">{e.card.set?.name} · {e.card.rarity||"Unknown"}</div>
+                <span className="variant-tag">{e.variantLabel}</span>
+              </div>
+              <div className="card-price">{e.price!=null?fmt(e.price):"N/A"}<button className="remove-btn" onClick={()=>removeEntry(cur.id,e.uid)}>remove</button></div>
+            </div>
           ))}
         </div>
       )}
-      {!cur && wishlists.length>0 && <div className="empty">Select a wishlist above.</div>}
-      {!wishlists.length && !showCreate && <div className="empty">No wishlists yet. Create one to get started.</div>}
+      {!cur&&wishlists.length>0&&<div className="empty">Select a wishlist above.</div>}
+      {!wishlists.length&&!showCreate&&<div className="empty">No wishlists yet. Create one to get started.</div>}
     </div>
   );
 }
 
+// ─── MasterSetsTab ────────────────────────────────────────────────────────────
 function MasterSetsTab({ masterSets, setMasterSets }) {
-  const [active, setActive] = useState(null);
-  const [q, setQ] = useState("");
-  const [setResults, setSetResults] = useState([]);
-  const [loadingSet, setLoadingSet] = useState(false);
-  const [loadingCards, setLoadingCards] = useState(false);
-  const [showSearch, setShowSearch] = useState(false);
-  const [collapsed, setCollapsed] = useState({});
+  const [active,setActive]=useState(null); const [q,setQ]=useState(""); const [setResults,setSetResults]=useState([]);
+  const [loadingSet,setLoadingSet]=useState(false); const [loadingCards,setLoadingCards]=useState(false);
+  const [showSearch,setShowSearch]=useState(false); const [collapsed,setCollapsed]=useState({});
 
-  const searchSets = async () => {
-    if (!q.trim()) return;
-    setLoadingSet(true);
-    try {
-      const r = await fetch(`${API}/sets?q=name:"${encodeURIComponent(q.trim())}"&pageSize=10`);
-      const d = await r.json();
-      setSetResults(d.data||[]);
-    } catch { setSetResults([]); }
-    setLoadingSet(false);
-  };
+  const searchSets=async()=>{ if(!q.trim()) return; setLoadingSet(true); try { const r=await fetch(`${API}/sets?q=name:"${encodeURIComponent(q.trim())}"&pageSize=10`); const d=await r.json(); setSetResults(d.data||[]); } catch { setSetResults([]); } setLoadingSet(false); };
 
-  const addSet = async (set) => {
-    if (masterSets.find(s=>s.id===set.id)) { setShowSearch(false); setActive(set.id); return; }
+  const addSet=async(set)=>{
+    if(masterSets.find(s=>s.id===set.id)){setShowSearch(false);setActive(set.id);return;}
     setLoadingCards(true);
     try {
-      let all=[], page=1, total=999;
-      while (all.length < total) {
-        const r = await fetch(`${API}/cards?q=set.id:${set.id}&pageSize=250&page=${page}`);
-        const d = await r.json();
-        total = d.totalCount;
-        all = [...all, ...(d.data||[])];
-        if (!(d.data||[]).length) break;
-        page++;
-      }
+      let all=[],page=1,total=999;
+      while(all.length<total){ const r=await fetch(`${API}/cards?q=set.id:${set.id}&pageSize=250&page=${page}`); const d=await r.json(); total=d.totalCount; all=[...all,...(d.data||[])]; if(!(d.data||[]).length) break; page++; }
       all.sort((a,b)=>(parseInt(a.number)||0)-(parseInt(b.number)||0));
-      // For cards with 0-1 price variants from bulk fetch, re-fetch individually to get full price data
-      const needsRefetch = all.filter(c => Object.keys(c.tcgplayer?.prices||{}).length <= 1);
-      console.log("Cards needing refetch:", needsRefetch.length);
-      for (const card of needsRefetch) {
-        try {
-          const r = await fetch(`${API}/cards/${card.id}`);
-          const d = await r.json();
-          if (d.data) {
-            const idx = all.findIndex(c => c.id === card.id);
-            if (idx !== -1) all[idx] = d.data;
-          }
-        } catch {}
-      }
-      const withPokeball = all.filter(c => c.tcgplayer?.prices?.pokeBallReverseHolofoil);
-      console.log("Cards with pokeBallReverseHolofoil after refetch:", withPokeball.length);
-      if (withPokeball.length > 0) console.log("Example:", withPokeball[0].name, JSON.stringify(withPokeball[0].tcgplayer?.prices));
-      // Expand cards into variants
-      const entries = [];
-      all.forEach(card => {
-        getVariants(card).forEach(v => {
-          entries.push({ id: variantId(card.id, v.key), cardId: card.id, card, variantKey: v.key, variantLabel: v.label, price: v.price });
+      const entries=[];
+      all.forEach(card=>{
+        getAllVariants(card, set.id).forEach(v=>{
+          entries.push({id:vid(card.id,v.key),cardId:card.id,card,variantKey:v.key,variantLabel:v.label,price:v.price,isSynth:v.isSynth});
         });
       });
       setMasterSets(prev=>[...prev,{id:set.id,name:set.name,logo:set.images?.logo,entries,checked:{}}]);
       setActive(set.id);
-    } catch(e) { console.error(e); }
+    } catch(e){console.error(e);}
     setLoadingCards(false); setShowSearch(false); setSetResults([]); setQ("");
   };
 
-  const toggle = (setId, entryId, val) => setMasterSets(prev=>prev.map(s=>s.id===setId?{...s,checked:{...s.checked,[entryId]:val}}:s));
-  const removeSet = id => { setMasterSets(prev=>prev.filter(s=>s.id!==id)); if(active===id) setActive(null); };
+  const toggleEntry=(setId,entryId)=>setMasterSets(prev=>prev.map(s=>s.id===setId?{...s,checked:{...s.checked,[entryId]:!s.checked[entryId]}}:s));
+  const removeSet=id=>{setMasterSets(prev=>prev.filter(s=>s.id!==id));if(active===id)setActive(null);};
 
-  const cur = masterSets.find(s=>s.id===active);
+  const cur=masterSets.find(s=>s.id===active);
 
-  // Group entries by card number for display
-  function groupEntries(entries) {
-    const groups = [];
-    const seen = {};
-    entries.forEach(e => {
-      if (!seen[e.cardId]) { seen[e.cardId] = []; groups.push({ cardId: e.cardId, card: e.card, variants: [] }); }
-      const g = groups.find(g=>g.cardId===e.cardId);
-      g.variants.push(e);
-    });
-    return groups;
-  }
+  function groupEntries(entries){ const groups=[],seen={}; entries.forEach(e=>{if(!seen[e.cardId]){seen[e.cardId]=true;groups.push({cardId:e.cardId,card:e.card,variants:[]});} groups.find(g=>g.cardId===e.cardId).variants.push(e);}); return groups; }
 
   return (
     <div>
       <div className="pill-wrap">
-        {masterSets.map(s=>{
-          const owned=Object.values(s.checked).filter(Boolean).length;
-          const total=s.entries?.length||0;
-          return (
-            <span key={s.id} className={`pill${active===s.id?" active":""}`} onClick={()=>setActive(s.id)}>
-              {s.name} <span style={{fontSize:11,opacity:0.7,marginLeft:4}}>({owned}/{total})</span>
-            </span>
-          );
-        })}
+        {masterSets.map(s=>{const owned=Object.values(s.checked).filter(Boolean).length;const tot=(s.entries||[]).length;return(<span key={s.id} className={`pill${active===s.id?" active":""}`} onClick={()=>setActive(s.id)}>{s.name}<span style={{fontSize:11,opacity:0.7,marginLeft:4}}>({owned}/{tot})</span></span>);})}
         <button onClick={()=>setShowSearch(!showSearch)}>+ Add Set</button>
       </div>
-
-      {showSearch && (
+      {showSearch&&(
         <div className="search-box">
-          <div className="flex-gap" style={{marginBottom:12}}>
-            <input type="text" value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>e.key==="Enter"&&searchSets()} placeholder="Search Pokémon sets..." />
-            <button onClick={searchSets}>Search</button>
-            <button onClick={()=>{setShowSearch(false);setSetResults([]);}}>Cancel</button>
-          </div>
-          {loadingSet && <div style={{fontSize:14,color:"var(--text2)"}}>Searching...</div>}
-          {loadingCards && <div style={{fontSize:14,color:"var(--text2)"}}>Loading cards and variant data... larger sets may take 15–30 seconds.</div>}
+          <div className="flex-gap" style={{marginBottom:12}}><input type="text" value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>e.key==="Enter"&&searchSets()} placeholder="Search Pokémon sets..."/><button onClick={searchSets}>Search</button><button onClick={()=>{setShowSearch(false);setSetResults([]);}}>Cancel</button></div>
+          {loadingSet&&<div style={{fontSize:14,color:"var(--text2)"}}>Searching...</div>}
+          {loadingCards&&<div style={{fontSize:14,color:"var(--text2)"}}>Loading cards and variants…</div>}
           {setResults.map(s=>(
-            <div key={s.id} className="card-item">
-              {s.images?.logo && <img src={s.images.logo} alt={s.name} style={{height:26,width:"auto",objectFit:"contain",flexShrink:0}} />}
-              <div style={{flex:1}}>
-                <div className="card-name" style={{fontSize:13}}>{s.name}</div>
-                <div className="card-sub">{s.series} · {s.printedTotal||s.total||"?"} cards</div>
-              </div>
-              <button className="small-btn" onClick={()=>addSet(s)}>Add</button>
-            </div>
+            <div key={s.id} className="card-item"><img src={s.images?.logo||""} alt={s.name} style={{height:26,width:"auto",objectFit:"contain",flexShrink:0,display:s.images?.logo?"block":"none"}}/><div style={{flex:1}}><div className="card-name" style={{fontSize:13}}>{s.name}</div><div className="card-sub">{s.series} · {s.printedTotal||s.total||"?"} cards</div></div><button className="small-btn" onClick={()=>addSet(s)}>Add</button></div>
           ))}
         </div>
       )}
-
-      {cur && (()=>{
-        const owned=Object.values(cur.checked).filter(Boolean).length;
-        const total=cur.entries?.length||0;
-        const pct=total?Math.round(owned/total*100):0;
-        const isCollapsed=collapsed[cur.id];
-        const groups=groupEntries(cur.entries||[]);
-        return (
+      {cur&&(()=>{
+        const owned=Object.values(cur.checked).filter(Boolean).length; const total=(cur.entries||[]).length; const pct=total?Math.round(owned/total*100):0; const isCollapsed=collapsed[cur.id]; const groups=groupEntries(cur.entries||[]);
+        return(
           <div>
             <div className="row" style={{marginBottom:8}}>
-              {cur.logo && <img src={cur.logo} alt={cur.name} style={{height:30,objectFit:"contain"}} />}
-              <div style={{flex:1}}>
-                <div style={{fontWeight:500,fontSize:15}}>{cur.name}</div>
-                <div style={{fontSize:12,color:"var(--text2)"}}>{owned} / {total} variants ({pct}%)</div>
-                <div className="progress-bar"><div className="progress-fill" style={{width:`${pct}%`}} /></div>
-              </div>
+              {cur.logo&&<img src={cur.logo} alt={cur.name} style={{height:30,objectFit:"contain"}}/>}
+              <div style={{flex:1}}><div style={{fontWeight:500,fontSize:15}}>{cur.name}</div><div style={{fontSize:12,color:"var(--text2)"}}>{owned} / {total} variants ({pct}%)</div><div className="progress-bar"><div className="progress-fill" style={{width:`${pct}%`}}/></div></div>
               <button className="small-btn danger-btn" onClick={()=>removeSet(cur.id)}>Remove</button>
             </div>
             <button className="small-btn" style={{marginBottom:10}} onClick={()=>setCollapsed(p=>({...p,[cur.id]:!p[cur.id]}))}>
               {isCollapsed?"▶ Show cards":"▼ Hide cards"}
             </button>
-            {!isCollapsed && (
+            {!isCollapsed&&(
               <div className="scrollable">
                 {groups.map(g=>(
-                  <div key={g.cardId} style={{marginBottom:6}}>
-                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:3}}>
-                      {g.card.images?.small && <img src={g.card.images.small} alt={g.card.name} style={{width:30,height:42,objectFit:"contain",borderRadius:3,flexShrink:0}} loading="lazy" />}
-                      <div>
-                        <div className="card-name">{g.card.name}</div>
-                        <div className="card-sub">#{g.card.number} · {g.card.rarity||"Unknown"}</div>
+                  <div key={g.cardId} style={{marginBottom:10}}>
+                    <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+                      {g.card.images?.small && (
+                        <img src={g.card.images.small} alt={g.card.name}
+                          style={{width:56,height:78,objectFit:"contain",borderRadius:4,flexShrink:0}}
+                          loading="lazy"/>
+                      )}
+                      <div style={{flex:1,minWidth:0}}>
+                        <div className="card-name" style={{marginBottom:2}}>{g.card.name}</div>
+                        <div className="card-sub" style={{marginBottom:4}}>#{g.card.number} · {g.card.rarity||"Unknown"}</div>
+                        {g.variants.map(e=>(
+                          <VariantPill key={e.id} label={e.variantLabel} price={e.price} isSynth={e.isSynth} checked={!!cur.checked[e.id]} onToggle={()=>toggleEntry(cur.id,e.id)} />
+                        ))}
                       </div>
-                    </div>
-                    <div style={{paddingLeft:38}}>
-                      {g.variants.map(e=>(
-                        <div key={e.id} className="card-item variant-row" style={{marginBottom:3,padding:"5px 8px"}}>
-                          <input type="checkbox" checked={!!cur.checked[e.id]} onChange={ev=>toggle(cur.id,e.id,ev.target.checked)} />
-                          <span style={{flex:1,fontSize:12,color:"var(--text2)"}}>{e.variantLabel}</span>
-                          <span className="card-price" style={{fontSize:12}}>{e.price!=null?fmt(e.price):<span className="no-price">—</span>}</span>
-                        </div>
-                      ))}
                     </div>
                   </div>
                 ))}
@@ -445,81 +377,64 @@ function MasterSetsTab({ masterSets, setMasterSets }) {
           </div>
         );
       })()}
-      {!cur && masterSets.length>0 && <div className="empty">Select a set above.</div>}
-      {!masterSets.length && !showSearch && <div className="empty">No master sets yet. Click "+ Add Set" to begin.</div>}
+      {!cur&&masterSets.length>0&&<div className="empty">Select a set above.</div>}
+      {!masterSets.length&&!showSearch&&<div className="empty">No master sets yet. Click "+ Add Set" to begin.</div>}
     </div>
   );
 }
 
+// ─── BuyListTab ───────────────────────────────────────────────────────────────
 function BuyListTab({ wishlists, masterSets, setMasterSets }) {
-  const [collapsed, setCollapsed] = useState({});
-  const toggleSec = id => setCollapsed(p=>({...p,[id]:!p[id]}));
-
-  const sections = [];
-  masterSets.forEach(s=>{
-    const needed=(s.entries||[]).filter(e=>!s.checked[e.id]);
-    if(needed.length) sections.push({id:s.id,name:s.name,logo:s.logo,entries:needed,type:"master"});
-  });
-  wishlists.forEach(l=>{
-    const entries=l.entries||[];
-    if(entries.length) sections.push({id:l.id,name:l.name,logo:null,entries,type:"wishlist"});
-  });
-
+  const [collapsed,setCollapsed]=useState({});
+  const toggleSec=id=>setCollapsed(p=>({...p,[id]:!p[id]}));
+  const sections=[];
+  masterSets.forEach(s=>{ const needed=(s.entries||[]).filter(e=>!s.checked[e.id]); if(needed.length) sections.push({id:s.id,name:s.name,logo:s.logo,entries:needed,type:"master"}); });
+  wishlists.forEach(l=>{ const entries=l.entries||[]; if(entries.length) sections.push({id:l.id,name:l.name,logo:null,entries,type:"wishlist"}); });
   const grand=sections.reduce((t,s)=>t+s.entries.reduce((st,e)=>st+(e.price||0),0),0);
-  const totalCards=sections.reduce((t,s)=>t+s.entries.length,0);
-
-  if(!sections.length) return <div className="empty">Your buy list is empty. Add master sets or wishlists to populate it.</div>;
-
+  if(!sections.length) return <div className="empty">Your buy list is empty.</div>;
   return (
     <div>
       <div className="grand-total">
         <div><div className="total-label">Estimated total</div><div className="total-val">{fmt(grand)||"$0.00"}</div></div>
-        <div style={{textAlign:"right"}}><div className="total-label">Items needed</div><div className="total-val">{totalCards}</div></div>
+        <div style={{textAlign:"right"}}><div className="total-label">Items needed</div><div className="total-val">{sections.reduce((t,s)=>t+s.entries.length,0)}</div></div>
       </div>
       {sections.map(sec=>{
-        const sub=sec.entries.reduce((t,e)=>t+(e.price||0),0);
-        const isOpen=!collapsed[sec.id];
-        return (
+        const sub=sec.entries.reduce((t,e)=>t+(e.price||0),0); const isOpen=!collapsed[sec.id];
+        return(
           <div key={sec.id} style={{marginBottom:10}}>
             <div className="section-header" onClick={()=>toggleSec(sec.id)}>
-              {sec.logo && <img src={sec.logo} alt={sec.name} style={{height:20,objectFit:"contain",flexShrink:0}} />}
-              {!sec.logo && <span className="wishlist-tag">wishlist</span>}
+              {sec.logo&&<img src={sec.logo} alt={sec.name} style={{height:20,objectFit:"contain",flexShrink:0}}/>}
+              {!sec.logo&&<span className="wishlist-tag">wishlist</span>}
               <span className="section-name">{sec.name}</span>
               <span className="section-meta">{sec.entries.length} · {fmt(sub)||"$0.00"}</span>
               <span className={`chevron${isOpen?" open":""}`}>▼</span>
             </div>
-            {isOpen && (() => {
-              if (sec.type === "wishlist") {
-                return sec.entries.map(e=>(
-                  <CardItem key={e.uid} card={e.card} variantLabel={e.variantLabel} price={e.price} />
-                ));
-              }
-              // Group master set entries by card
-              const groups = [];
-              const seen = {};
-              sec.entries.forEach(e=>{
-                if(!seen[e.cardId]){seen[e.cardId]=true;groups.push({cardId:e.cardId,card:e.card,variants:[]});}
-                groups.find(g=>g.cardId===e.cardId).variants.push(e);
-              });
+            {isOpen&&(()=>{
+              if(sec.type==="wishlist") return sec.entries.map(e=>(
+                <div key={e.uid} className="card-item">
+                  {e.card.images?.small&&<img src={e.card.images.small} alt={e.card.name} loading="lazy"/>}
+                  <div style={{flex:1,minWidth:0}}><div className="card-name">{e.card.name}</div><div className="card-sub">{e.card.set?.name}</div><span className="variant-tag">{e.variantLabel}</span></div>
+                  <div className="card-price">{e.price!=null?fmt(e.price):"N/A"}</div>
+                </div>
+              ));
+              const groups=[]; const seen={};
+              sec.entries.forEach(e=>{ if(!seen[e.cardId]){seen[e.cardId]=true;groups.push({cardId:e.cardId,card:e.card,variants:[]});} groups.find(g=>g.cardId===e.cardId).variants.push(e); });
               return groups.map(g=>(
-                <div key={g.cardId} style={{marginBottom:6}}>
-                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:3}}>
-                    {g.card.images?.small && <img src={g.card.images.small} alt={g.card.name} style={{width:30,height:42,objectFit:"contain",borderRadius:3,flexShrink:0}} loading="lazy" />}
-                    <div>
-                      <div className="card-name">{g.card.name}</div>
-                      <div className="card-sub">#{g.card.number} · {g.card.set?.name}</div>
+                <div key={g.cardId} style={{marginBottom:10}}>
+                  <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+                    {g.card.images?.small && (
+                      <img src={g.card.images.small} alt={g.card.name}
+                        style={{width:56,height:78,objectFit:"contain",borderRadius:4,flexShrink:0}}
+                        loading="lazy"/>
+                    )}
+                    <div style={{flex:1,minWidth:0}}>
+                      <div className="card-name" style={{marginBottom:2}}>{g.card.name}</div>
+                      <div className="card-sub" style={{marginBottom:4}}>#{g.card.number} · {g.card.set?.name}</div>
+                      {g.variants.map(e=>(
+                        <VariantPill key={e.id} label={e.variantLabel} price={e.price} isSynth={e.isSynth} checked={false}
+                          onToggle={()=>setMasterSets(prev=>prev.map(s=>s.id===sec.id?{...s,checked:{...s.checked,[e.id]:true}}:s))} />
+                      ))}
                     </div>
-                  </div>
-                  <div style={{paddingLeft:38}}>
-                    {g.variants.map(e=>(
-                      <div key={e.id} className="card-item variant-row" style={{marginBottom:3,padding:"5px 8px"}}>
-                        <input type="checkbox" checked={false} onChange={ev=>{
-                          if(ev.target.checked) setMasterSets(prev=>prev.map(s=>s.id===sec.id?{...s,checked:{...s.checked,[e.id]:true}}:s));
-                        }} />
-                        <span style={{flex:1,fontSize:12,color:"var(--text2)"}}>{e.variantLabel}</span>
-                        <span className="card-price" style={{fontSize:12}}>{e.price!=null?fmt(e.price):<span className="no-price">—</span>}</span>
-                      </div>
-                    ))}
                   </div>
                 </div>
               ));
@@ -531,97 +446,56 @@ function BuyListTab({ wishlists, masterSets, setMasterSets }) {
   );
 }
 
+// ─── StatsTab ─────────────────────────────────────────────────────────────────
 function StatsTab({ wishlists, masterSets }) {
   const totalOwned=masterSets.reduce((t,s)=>t+Object.values(s.checked).filter(Boolean).length,0);
   const totalNeeded=masterSets.reduce((t,s)=>t+(s.entries||[]).filter(e=>!s.checked[e.id]).length,0);
   const wTotal=wishlists.reduce((t,l)=>t+(l.entries||[]).length,0);
-  const buyVal=masterSets.reduce((t,s)=>t+(s.entries||[]).filter(e=>!s.checked[e.id]).reduce((st,e)=>st+(e.price||0),0),0)
-    +wishlists.reduce((t,l)=>t+(l.entries||[]).reduce((st,e)=>st+(e.price||0),0),0);
+  const buyVal=masterSets.reduce((t,s)=>t+(s.entries||[]).filter(e=>!s.checked[e.id]).reduce((st,e)=>st+(e.price||0),0),0)+wishlists.reduce((t,l)=>t+(l.entries||[]).reduce((st,e)=>st+(e.price||0),0),0);
   return (
     <div>
       <div className="stat-grid">
-        {[["Variants owned",totalOwned],["Variants needed",totalNeeded],["Wishlist entries",wTotal],["Est. buy list value",fmt(buyVal)||"$0.00"]].map(([l,v])=>(
-          <div key={l} className="stat-card"><div className="stat-label">{l}</div><div className="stat-val">{v}</div></div>
-        ))}
+        {[["Variants owned",totalOwned],["Variants needed",totalNeeded],["Wishlist entries",wTotal],["Est. buy list value",fmt(buyVal)||"$0.00"]].map(([l,v])=>(<div key={l} className="stat-card"><div className="stat-label">{l}</div><div className="stat-val">{v}</div></div>))}
       </div>
-      {masterSets.length>0 && (
-        <div>
-          <h3 style={{marginBottom:12}}>Master set progress</h3>
-          {masterSets.map(s=>{
-            const owned=Object.values(s.checked).filter(Boolean).length;
-            const total=(s.entries||[]).length;
-            const pct=total?Math.round(owned/total*100):0;
-            return (
-              <div key={s.id} style={{marginBottom:12}}>
-                <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
-                  <span style={{fontSize:13}}>{s.name}</span>
-                  <span style={{fontSize:13,color:"var(--text2)"}}>{owned}/{total} ({pct}%)</span>
-                </div>
-                <div className="progress-bar"><div className="progress-fill" style={{width:`${pct}%`}} /></div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-      {wishlists.length>0 && (
-        <div style={{marginTop:20}}>
-          <h3 style={{marginBottom:12}}>Wishlists</h3>
-          {wishlists.map(l=>{
-            const val=(l.entries||[]).reduce((t,e)=>t+(e.price||0),0);
-            return (
-              <div key={l.id} style={{display:"flex",justifyContent:"space-between",padding:"8px 12px",background:"var(--bg2)",borderRadius:8,marginBottom:6,border:"0.5px solid var(--border)"}}>
-                <span style={{fontSize:13}}>{l.name}</span>
-                <span style={{fontSize:13,color:"var(--text2)"}}>{(l.entries||[]).length} entries · {fmt(val)||"$0.00"}</span>
-              </div>
-            );
-          })}
-        </div>
-      )}
-      {!masterSets.length && !wishlists.length && <div className="empty">No data yet. Add master sets and wishlists to see stats.</div>}
+      {masterSets.length>0&&(<div><h3 style={{marginBottom:12}}>Master set progress</h3>{masterSets.map(s=>{const owned=Object.values(s.checked).filter(Boolean).length;const total=(s.entries||[]).length;const pct=total?Math.round(owned/total*100):0;return(<div key={s.id} style={{marginBottom:12}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:13}}>{s.name}</span><span style={{fontSize:13,color:"var(--text2)"}}>{owned}/{total} ({pct}%)</span></div><div className="progress-bar"><div className="progress-fill" style={{width:`${pct}%`}}/></div></div>);})}</div>)}
+      {wishlists.length>0&&(<div style={{marginTop:20}}><h3 style={{marginBottom:12}}>Wishlists</h3>{wishlists.map(l=>{const val=(l.entries||[]).reduce((t,e)=>t+(e.price||0),0);return(<div key={l.id} style={{display:"flex",justifyContent:"space-between",padding:"8px 12px",background:"var(--bg2)",borderRadius:8,marginBottom:6,border:"0.5px solid var(--border)"}}><span style={{fontSize:13}}>{l.name}</span><span style={{fontSize:13,color:"var(--text2)"}}>{(l.entries||[]).length} entries · {fmt(val)||"$0.00"}</span></div>);})}</div>)}
+      {!masterSets.length&&!wishlists.length&&<div className="empty">No data yet.</div>}
     </div>
   );
 }
 
-const TABS = ["Wishlists","Master Sets","Buy List","Stats"];
-
+// ─── App ──────────────────────────────────────────────────────────────────────
+const TABS=["Wishlists","Master Sets","Buy List","Stats"];
 function App() {
-  const [tab, setTab] = useState(0);
-  const [wishlists, setWishlistsRaw] = useState(()=>lstore("pkm_wishlists2",[]));
-  const [masterSets, setMasterSetsRaw] = useState(()=>lstore("pkm_mastersets2",[]));
+  const [tab,setTab]=useState(0);
+  const [ready,setReady]=useState(false);
+  const [wishlists,setWRaw]=useState(()=>lstore("pkm_wishlists2",[]));
+  const [masterSets,setMRaw]=useState(()=>lstore("pkm_mastersets2",[]));
+  const setWishlists=v=>{const n=typeof v==="function"?v(wishlists):v;setWRaw(n);sstore("pkm_wishlists2",n);};
+  const setMasterSets=v=>{const n=typeof v==="function"?v(masterSets):v;setMRaw(n);sstore("pkm_mastersets2",n);};
 
-  const setWishlists = v => { const n=typeof v==="function"?v(wishlists):v; setWishlistsRaw(n); sstore("pkm_wishlists2",n); };
-  const setMasterSets = v => { const n=typeof v==="function"?v(masterSets):v; setMasterSetsRaw(n); sstore("pkm_mastersets2",n); };
+  React.useEffect(()=>{
+    loadVariantsData().then(()=>setReady(true));
+  },[]);
 
-  return (
+  if(!ready) return <div style={{padding:40,textAlign:"center",color:"var(--text2)",fontSize:14}}>Loading variant data...</div>;
+  return(
     <div id="app">
       <div className="header">
-        <div className="logo-circle">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="#185fa5" strokeWidth="1.5"/>
-            <line x1="2" y1="12" x2="22" y2="12" stroke="#185fa5" strokeWidth="1.5"/>
-            <circle cx="12" cy="12" r="3" fill="#185fa5"/>
-          </svg>
-        </div>
+        <div className="logo-circle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#185fa5" strokeWidth="1.5"/><line x1="2" y1="12" x2="22" y2="12" stroke="#185fa5" strokeWidth="1.5"/><circle cx="12" cy="12" r="3" fill="#185fa5"/></svg></div>
         <h1>Pokémon Card Tracker</h1>
       </div>
       <div className="tab-bar">
-        {TABS.map((t,i)=>(
-          <button key={t} className={`tab-btn${tab===i?" active":""}`} onClick={()=>setTab(i)}>
-            {t}
-            {t==="Wishlists"&&wishlists.length>0&&<span className="badge">{wishlists.length}</span>}
-            {t==="Master Sets"&&masterSets.length>0&&<span className="badge">{masterSets.length}</span>}
-          </button>
-        ))}
+        {TABS.map((t,i)=>(<button key={t} className={`tab-btn${tab===i?" active":""}`} onClick={()=>setTab(i)}>{t}{t==="Wishlists"&&wishlists.length>0&&<span className="badge">{wishlists.length}</span>}{t==="Master Sets"&&masterSets.length>0&&<span className="badge">{masterSets.length}</span>}</button>))}
       </div>
-      {tab===0&&<WishlistsTab wishlists={wishlists} setWishlists={setWishlists} />}
-      {tab===1&&<MasterSetsTab masterSets={masterSets} setMasterSets={setMasterSets} />}
-      {tab===2&&<BuyListTab wishlists={wishlists} masterSets={masterSets} setMasterSets={setMasterSets} />}
-      {tab===3&&<StatsTab wishlists={wishlists} masterSets={masterSets} />}
+      {tab===0&&<WishlistsTab wishlists={wishlists} setWishlists={setWishlists}/>}
+      {tab===1&&<MasterSetsTab masterSets={masterSets} setMasterSets={setMasterSets}/>}
+      {tab===2&&<BuyListTab wishlists={wishlists} masterSets={masterSets} setMasterSets={setMasterSets}/>}
+      {tab===3&&<StatsTab wishlists={wishlists} masterSets={masterSets}/>}
     </div>
   );
 }
-
-ReactDOM.createRoot(document.getElementById("app")).render(<App />);
+ReactDOM.createRoot(document.getElementById("app")).render(<App/>);
 </script>
 </body>
 </html>
