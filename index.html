@@ -16,6 +16,7 @@
   --border:rgba(255,255,255,0.12);--border-strong:rgba(255,255,255,0.22);
   --text:#f0f4ff;--text2:#8fa3c0;--text3:#4a607a;
   --glass:rgba(255,255,255,0.07);--glass-hover:rgba(255,255,255,0.13);
+  --owned-tint:rgba(40,180,100,0.13);--owned-border:rgba(40,180,100,0.35);
   --radius:10px;--radius-lg:14px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -34,25 +35,23 @@ button:active{transform:scale(.98);}
 .btn-blue:hover{background:rgba(39,36,219,.45);border-color:var(--pk-blue-light);color:#e0dfff;}
 .btn-red{background:rgba(255,0,21,.18);border-color:rgba(255,68,85,.4);color:#ffb0b8;}
 .btn-red:hover{background:rgba(255,0,21,.32);border-color:var(--pk-red-light);color:#ffd0d5;}
+.btn-green{background:rgba(40,180,100,.2);border-color:rgba(40,180,100,.4);color:#7de8b0;}
+.btn-green:hover{background:rgba(40,180,100,.32);color:#a8f0c8;}
 .small-btn{font-size:12px;padding:5px 11px;}
 .glass-card{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);backdrop-filter:blur(12px);}
-/* Header */
 .app-header{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
 .header-icon{width:38px;height:38px;border-radius:50%;background:rgba(39,36,219,.25);border:0.5px solid rgba(86,84,240,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-/* Tabs */
 .tab-bar{display:flex;gap:4px;background:rgba(255,255,255,.05);border:0.5px solid var(--border);border-radius:13px;padding:4px;margin-bottom:22px;}
 .tab-btn{flex:1;padding:9px 4px;text-align:center;font-size:13px;color:#fff;border-radius:10px;cursor:pointer;border:none;background:none;transition:background .22s,box-shadow .22s;font-weight:400;}
 .tab-btn:hover:not(.active-blue):not(.active-red){background:var(--glass-hover);}
 .tab-btn.active-blue{background:var(--pk-blue);color:#fff;font-weight:500;box-shadow:0 2px 14px rgba(39,36,219,.55);}
 .tab-btn.active-red{background:var(--pk-red);color:#fff;font-weight:500;box-shadow:0 2px 14px rgba(255,0,21,.45);}
 .badge{display:inline-block;background:rgba(255,255,255,.18);color:#fff;border-radius:10px;padding:1px 6px;font-size:11px;margin-left:4px;}
-/* Pills */
 .pill-wrap{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
 .pill{display:inline-flex;align-items:center;padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;border:0.5px solid var(--border);background:var(--glass);color:var(--text);backdrop-filter:blur(8px);transition:all .18s;}
 .pill:hover{background:var(--glass-hover);border-color:var(--border-strong);}
 .pill.pill-blue{background:rgba(39,36,219,.22);border-color:rgba(86,84,240,.45);color:#c0bfff;font-weight:500;}
 .pill.pill-red{background:rgba(255,0,21,.18);border-color:rgba(255,68,85,.4);color:#ffb0b8;font-weight:500;}
-/* Set header */
 .set-card{padding:16px;margin-bottom:12px;}
 .set-top{display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;}
 .set-name{font-size:15px;font-weight:500;margin-bottom:2px;}
@@ -63,27 +62,22 @@ button:active{transform:scale(.98);}
 .stat-tile{background:rgba(255,255,255,.04);border:0.5px solid var(--border);border-radius:8px;padding:8px 10px;}
 .stat-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:3px;}
 .stat-val{font-size:14px;font-weight:500;color:var(--text);}
-/* Section header */
 .sec-hdr{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--glass);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:6px;cursor:pointer;transition:background .18s;}
 .sec-hdr:hover{background:var(--glass-hover);}
 .sec-name{font-size:14px;font-weight:500;flex:1;}
 .sec-meta{font-size:12px;color:var(--text2);white-space:nowrap;}
 .chevron{font-size:11px;color:var(--text3);flex-shrink:0;transition:transform .28s cubic-bezier(.4,0,.2,1);}
 .chevron.open{transform:rotate(180deg);}
-/* Collapsible */
 .collapsible{overflow:hidden;transition:max-height .38s cubic-bezier(.4,0,.2,1),opacity .3s ease;}
 .collapsible.open{max-height:9999px;opacity:1;}
 .collapsible.closed{max-height:0;opacity:0;}
-/* Grand total */
 .grand-total{display:flex;justify-content:space-between;align-items:center;background:rgba(39,36,219,.14);border:0.5px solid rgba(86,84,240,.28);border-radius:var(--radius-lg);padding:13px 16px;margin-bottom:18px;}
 .total-lbl{font-size:11px;color:var(--text2);margin-bottom:2px;}
 .total-val{font-size:22px;font-weight:500;}
-/* Stat cards */
 .stat-card{background:var(--glass);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;flex:1 1 140px;}
 .stat-card-lbl{font-size:12px;color:var(--text2);margin-bottom:4px;}
 .stat-card-val{font-size:22px;font-weight:500;}
 .stat-card-grid{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
-/* Search */
 .search-box{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px;}
 .empty{color:var(--text2);font-size:14px;padding:30px 0;text-align:center;}
 .flex-gap{display:flex;gap:8px;}
@@ -92,51 +86,67 @@ button:active{transform:scale(.98);}
 .wishlist-tag{font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,0,21,.18);color:#ffb0b8;flex-shrink:0;}
 .variant-tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:6px;margin-top:3px;background:rgba(255,255,255,.06);color:var(--text2);border:0.5px solid var(--border);}
 .no-price-badge{font-size:10px;padding:2px 6px;border-radius:5px;background:rgba(255,255,255,.05);border:0.5px solid var(--border);color:var(--text3);}
-/* Variant pill */
 .variant-pill{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:var(--glass);border:0.5px solid var(--border);margin-bottom:3px;cursor:pointer;user-select:none;transition:background .18s,border-color .18s;}
 .variant-pill:hover{background:rgba(39,36,219,.18);border-color:rgba(86,84,240,.4);}
 .variant-pill.checked{background:rgba(39,36,219,.2);border-color:rgba(86,84,240,.4);opacity:.6;}
 .variant-pill.checked .vp-label{text-decoration:line-through;color:var(--text3);}
 .vp-label{flex:1;font-size:12px;color:var(--text2);}
 .vp-price{font-size:12px;font-weight:500;color:var(--text);}
-/* LIST view */
+/* List card group */
 .list-card-group{display:flex;gap:10px;align-items:flex-start;margin-bottom:16px;padding-bottom:16px;border-bottom:0.5px solid var(--border);}
 .list-card-group:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
 .list-card-img{width:60px;height:84px;object-fit:contain;border-radius:5px;flex-shrink:0;border:0.5px solid var(--border);}
 .list-card-info{flex:1;min-width:0;}
 .card-name{font-weight:500;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .card-sub{font-size:11px;color:var(--text2);}
-/* LIST wishlist item */
-.card-item{display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--glass);border-radius:var(--radius);border:0.5px solid var(--border);margin-bottom:5px;}
-.card-item .wi-img{width:52px;height:72px;object-fit:contain;border-radius:4px;flex-shrink:0;}
+/* Collection list item */
+.coll-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:var(--radius);border:0.5px solid var(--border);margin-bottom:5px;transition:background .18s,border-color .18s;}
+.coll-item.not-owned{background:var(--glass);}
+.coll-item.is-owned{background:var(--owned-tint);border-color:var(--owned-border);}
+.coll-item .wi-img{width:52px;height:72px;object-fit:contain;border-radius:4px;flex-shrink:0;}
 .card-price{font-size:13px;font-weight:500;text-align:right;flex-shrink:0;color:var(--text);}
 .remove-btn{font-size:11px;color:#ffb0b8;background:none;border:none;cursor:pointer;padding:2px 0;display:block;margin-top:2px;}
-/* GRID view */
-.grid-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;}
-.grid-card{background:var(--glass);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:background .18s,border-color .18s;position:relative;}
-.grid-card:hover{background:var(--glass-hover);border-color:var(--border-strong);}
-.grid-card.all-owned{opacity:.5;}
-.grid-card img{width:100%;max-width:100px;height:auto;border-radius:4px;}
-.grid-card-name{font-size:11px;font-weight:500;text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.grid-card-sub{font-size:10px;color:var(--text2);text-align:center;}
-.grid-card-progress{width:100%;height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
-.grid-card-progress-fill{height:100%;background:var(--pk-blue);border-radius:2px;}
-/* View toggle */
-.view-toggle{display:flex;gap:4px;background:rgba(255,255,255,.05);border:0.5px solid var(--border);border-radius:8px;padding:3px;}
-.view-btn{padding:5px 10px;font-size:12px;border:none;background:none;color:var(--text2);border-radius:6px;cursor:pointer;transition:all .18s;}
-.view-btn.active{background:var(--glass-hover);color:var(--text);}
-/* Toolbar row */
+.owned-badge{font-size:10px;padding:2px 7px;border-radius:6px;background:rgba(40,180,100,.2);color:#7de8b0;border:0.5px solid rgba(40,180,100,.35);display:inline-block;margin-top:3px;}
+/* Grid view */
+.grid-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;max-width:100%;}
+@media(min-width:700px){.grid-view{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));}}
+/* 5-column cap via max width per cell trick */
+.grid-view > *{max-width:100%;}
+/* Flip card */
+.flip-wrap{perspective:800px;}
+.flip-inner{position:relative;width:100%;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.4,0,.2,1);}
+.flip-inner.flipped{transform:rotateY(180deg);}
+.flip-front,.flip-back{backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--radius-lg);border:0.5px solid var(--border);}
+.flip-front{background:var(--glass);padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:background .18s,border-color .18s;}
+.flip-front:hover{background:var(--glass-hover);border-color:var(--border-strong);}
+.flip-front.all-owned{opacity:.5;}
+.flip-back{position:absolute;top:0;left:0;width:100%;background:rgba(20,30,55,.97);padding:10px;transform:rotateY(180deg);cursor:default;display:flex;flex-direction:column;gap:4px;min-height:100%;}
+.flip-card-img{width:100%;max-width:100px;height:auto;border-radius:4px;}
+.flip-card-name{font-size:11px;font-weight:500;text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.flip-card-sub{font-size:10px;color:var(--text2);text-align:center;}
+.flip-card-progress{width:100%;height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
+.flip-card-progress-fill{height:100%;background:var(--pk-blue);border-radius:2px;}
+.flip-tap-hint{font-size:10px;color:var(--text3);text-align:center;margin-top:2px;}
+/* Grid collection card */
+.grid-coll-card{background:var(--glass);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:10px;display:flex;flex-direction:column;align-items:center;gap:5px;transition:background .18s,border-color .18s;}
+.grid-coll-card.is-owned{background:var(--owned-tint);border-color:var(--owned-border);}
+.grid-coll-card img{width:100%;max-width:100px;height:auto;border-radius:4px;}
+/* Toolbar */
 .toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
 .filter-btn{font-size:12px;padding:5px 12px;border-radius:8px;}
 .filter-btn.active{background:rgba(39,36,219,.28);border-color:rgba(86,84,240,.5);color:#c0bfff;}
+.view-toggle{display:flex;gap:4px;background:rgba(255,255,255,.05);border:0.5px solid var(--border);border-radius:8px;padding:3px;}
+.view-btn{padding:5px 10px;font-size:12px;border:none;background:none;color:var(--text2);border-radius:6px;cursor:pointer;transition:all .18s;}
+.view-btn.active{background:var(--glass-hover);color:var(--text);}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const {useState,useEffect,useCallback}=React;
+const {useState,useEffect}=React;
 const API="https://api.pokemontcg.io/v2";
 const VARIANTS_URL="https://raw.githubusercontent.com/erinspace-png/Cardboard-Hoard/main/variants.json";
+const TCGPLAYER_BASE="https://www.tcgplayer.com/search/pokemon/product?q=";
 
 const VARIANT_LABELS={normal:"Normal",holofoil:"Holofoil",reverseHolofoil:"Reverse Holofoil",masterBallReverseHolofoil:"Master Ball Reverse Holo",pokeBallReverseHolofoil:"Poké Ball Reverse Holo",energyReverseHolofoil:"Energy Reverse Holo",ballReverseHolofoil:"Ball Reverse Holo","1stEditionHolofoil":"1st Edition Holofoil","1stEditionNormal":"1st Edition Normal",unlimitedHolofoil:"Unlimited Holofoil"};
 const VARIANT_ORDER=["normal","holofoil","reverseHolofoil","pokeBallReverseHolofoil","masterBallReverseHolofoil","energyReverseHolofoil","ballReverseHolofoil","1stEditionNormal","1stEditionHolofoil","unlimitedHolofoil"];
@@ -145,7 +155,7 @@ const FALLBACK_VARIANTS={"sv8pt5":[{key:"pokeBallReverseHolofoil",label:"Poké B
 let SET_EXTRA_VARIANTS={};
 async function loadVariantsData(){
   try{const r=await fetch(VARIANTS_URL);const d=await r.json();Object.entries(d.sets||{}).forEach(([id,data])=>{SET_EXTRA_VARIANTS[id]=data.variants;});}
-  catch(e){console.warn("variants.json failed, using fallback:",e);SET_EXTRA_VARIANTS=FALLBACK_VARIANTS;}
+  catch(e){console.warn("variants.json failed:",e);SET_EXTRA_VARIANTS=FALLBACK_VARIANTS;}
 }
 
 const lstore=(k,fb)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch{return fb;}};
@@ -153,19 +163,13 @@ const sstore=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}};
 const fmt=n=>n!=null?`$${Number(n).toFixed(2)}`:null;
 const vid=(cid,vk)=>`${cid}__${vk}`;
 const labelFromKey=k=>VARIANT_LABELS[k]||k.replace(/([A-Z])/g,' $1').replace(/^./,s=>s.toUpperCase()).trim();
-
-// Rarity helpers
 const EX_SUBTYPES=["EX","GX","V","VMAX","VSTAR","ex","Mega","BREAK","LEGEND","Prism Star","ACE SPEC","Radiant"];
-const COMMON_UNCOMMON_RARITIES=["Common","Uncommon"];
-const NO_REVERSE_RARITIES=["Rare Holo EX","Rare Holo GX","Rare Holo V","Rare Holo VMAX","Rare Holo VSTAR","Rare Ultra","Rare Rainbow","Rare Secret","Rare Shiny","Rare Shiny GX","Illustration Rare","Special Illustration Rare","Hyper Rare","Double Rare","Trainer Gallery Rare Holo","ACE SPEC Rare","Ultra Rare","Shiny Ultra Rare"];
-
+const COMMON_UNCOMMON=["Common","Uncommon"];
+const NO_REVERSE=["Rare Holo EX","Rare Holo GX","Rare Holo V","Rare Holo VMAX","Rare Holo VSTAR","Rare Ultra","Rare Rainbow","Rare Secret","Rare Shiny","Rare Shiny GX","Illustration Rare","Special Illustration Rare","Hyper Rare","Double Rare","Trainer Gallery Rare Holo","ACE SPEC Rare","Ultra Rare","Shiny Ultra Rare"];
 const isEx=c=>(c.subtypes||[]).some(s=>EX_SUBTYPES.includes(s));
 const isPokemon=c=>c.supertype==="Pokémon";
 const isTrainer=c=>c.supertype==="Trainer"||c.supertype==="Energy";
-// Trainers above Uncommon (i.e. not Common or Uncommon) get no reverse holo
-const trainerGetsReverse=c=>isTrainer(c)&&COMMON_UNCOMMON_RARITIES.includes(c.rarity);
-// Cards that should never get any synth reverse variant
-const noSynthReverse=c=>isEx(c)||NO_REVERSE_RARITIES.includes(c.rarity)||(isTrainer(c)&&!trainerGetsReverse(c));
+const noSynthReverse=c=>isEx(c)||NO_REVERSE.includes(c.rarity)||(isTrainer(c)&&!COMMON_UNCOMMON.includes(c.rarity));
 
 function getAPIVariants(card){
   const prices=card.tcgplayer?.prices||{};const keys=Object.keys(prices);
@@ -190,7 +194,12 @@ function groupByCard(entries){
   return groups;
 }
 
-// ── VariantPill ───────────────────────────────────────────────────────────────
+function tcgUrl(card){
+  const name=encodeURIComponent(card.name||"");
+  const set=encodeURIComponent(card.set?.name||"");
+  return `${TCGPLAYER_BASE}${name}+${set}`;
+}
+
 function VariantPill({label,price,checked,onToggle}){
   return(
     <div className={`variant-pill${checked?" checked":""}`} onClick={onToggle}>
@@ -201,7 +210,6 @@ function VariantPill({label,price,checked,onToggle}){
   );
 }
 
-// ── CardSearch ────────────────────────────────────────────────────────────────
 function CardSearch({onAdd,placeholder}){
   const [q,setQ]=useState("");const [results,setResults]=useState([]);const [loading,setLoading]=useState(false);
   const [searched,setSearched]=useState(false);const [page,setPage]=useState(1);const [hasMore,setHasMore]=useState(false);
@@ -210,15 +218,12 @@ function CardSearch({onAdd,placeholder}){
     if(!q.trim())return;setLoading(true);if(pg===1){setResults([]);setSearched(true);}
     try{
       const r=await fetch(`${API}/cards?q=name:"${encodeURIComponent(q.trim())}"&pageSize=${PAGE_SIZE}&page=${pg}`);
-      const d=await r.json();
-      const newCards=d.data||[];
+      const d=await r.json();const newCards=d.data||[];
       setResults(prev=>pg===1?newCards:[...prev,...newCards]);
-      setHasMore((d.page*d.pageSize)<d.totalCount);
-      setPage(pg);
+      setHasMore((d.page*d.pageSize)<d.totalCount);setPage(pg);
     }catch{if(pg===1)setResults([]);}
     setLoading(false);
   };
-  const loadMore=()=>search(page+1);
   return(
     <div>
       <div className="flex-gap" style={{marginBottom:12}}>
@@ -227,83 +232,113 @@ function CardSearch({onAdd,placeholder}){
       </div>
       {loading&&page===1&&<div className="empty" style={{padding:"10px 0"}}>Searching...</div>}
       {searched&&!loading&&!results.length&&<div className="empty" style={{padding:"10px 0"}}>No results found.</div>}
-      <div style={{maxHeight:360,overflowY:"auto"}}>
+      <div style={{maxHeight:400,overflowY:"auto"}}>
         {results.map(card=>{
           const variants=getAllVariants(card,card.set?.id);
           return(
-            <div key={card.id} style={{marginBottom:10}}>
-              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
-                {card.images?.small&&<img src={card.images.small} alt={card.name} style={{width:36,height:50,objectFit:"contain",borderRadius:4,flexShrink:0}} loading="lazy"/>}
+            <div key={card.id} style={{marginBottom:12}}>
+              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
+                {card.images?.small&&<img src={card.images.small} alt={card.name} style={{width:52,height:72,objectFit:"contain",borderRadius:4,flexShrink:0}} loading="lazy"/>}
                 <div><div className="card-name">{card.name}</div><div className="card-sub">{card.set?.name} · {card.rarity||"Unknown"}</div></div>
               </div>
-              <div style={{paddingLeft:44,display:"flex",flexWrap:"wrap",gap:4}}>
+              <div style={{paddingLeft:62,display:"flex",flexWrap:"wrap",gap:4}}>
                 {variants.map(v=><button key={v.key} className="small-btn" onClick={()=>onAdd(card,v.key,v.label,v.price)} style={{fontSize:11}}>+ {v.label}{v.price!=null?` (${fmt(v.price)})`:"" }</button>)}
               </div>
             </div>
           );
         })}
         {hasMore&&<div style={{textAlign:"center",paddingTop:8}}>
-          <button className="btn-blue small-btn" onClick={loadMore} disabled={loading}>{loading?"Loading...":"Load more"}</button>
+          <button className="btn-blue small-btn" onClick={()=>search(page+1)} disabled={loading}>{loading?"Loading...":"Load more"}</button>
         </div>}
       </div>
     </div>
   );
 }
 
-// ── WishlistsTab ──────────────────────────────────────────────────────────────
-function WishlistsTab({wishlists,setWishlists}){
+// ── CollectionsTab ─────────────────────────────────────────────────────────────
+function CollectionsTab({collections,setCollections}){
   const [active,setActive]=useState(null);const [newName,setNewName]=useState("");const [showCreate,setShowCreate]=useState(false);
   const [showSearch,setShowSearch]=useState(false);const [renaming,setRenaming]=useState(null);const [renameVal,setRenameVal]=useState("");
-  const [view,setView]=useState("list");
-  const create=()=>{if(!newName.trim())return;const id=Date.now().toString();setWishlists([...wishlists,{id,name:newName.trim(),entries:[]}]);setNewName("");setShowCreate(false);setActive(id);};
-  const del=id=>{setWishlists(wishlists.filter(l=>l.id!==id));if(active===id)setActive(null);};
-  const addEntry=(lid,card,vKey,vLabel,price)=>{const e={uid:Date.now().toString(),card,variantKey:vKey,variantLabel:vLabel,price};setWishlists(wishlists.map(l=>l.id===lid?{...l,entries:[...l.entries,e]}:l));};
-  const removeEntry=(lid,uid)=>setWishlists(wishlists.map(l=>l.id===lid?{...l,entries:l.entries.filter(e=>e.uid!==uid)}:l));
-  const rename=id=>{if(!renameVal.trim())return;setWishlists(wishlists.map(l=>l.id===id?{...l,name:renameVal.trim()}:l));setRenaming(null);};
-  const cur=wishlists.find(l=>l.id===active);const entries=cur?.entries||[];
+  const [view,setView]=useState("list");const [hideOwned,setHideOwned]=useState(false);
+
+  const create=()=>{if(!newName.trim())return;const id=Date.now().toString();setCollections([...collections,{id,name:newName.trim(),entries:[]}]);setNewName("");setShowCreate(false);setActive(id);};
+  const del=id=>{setCollections(collections.filter(l=>l.id!==id));if(active===id)setActive(null);};
+  const addEntry=(lid,card,vKey,vLabel,price)=>{
+    const e={uid:Date.now().toString(),card,variantKey:vKey,variantLabel:vLabel,price,owned:false};
+    setCollections(collections.map(l=>l.id===lid?{...l,entries:[...l.entries,e]}:l));
+  };
+  const removeEntry=(lid,uid)=>setCollections(collections.map(l=>l.id===lid?{...l,entries:l.entries.filter(e=>e.uid!==uid)}:l));
+  const toggleOwned=(lid,uid)=>setCollections(collections.map(l=>l.id===lid?{...l,entries:l.entries.map(e=>e.uid===uid?{...e,owned:!e.owned}:e)}:l));
+  const rename=id=>{if(!renameVal.trim())return;setCollections(collections.map(l=>l.id===id?{...l,name:renameVal.trim()}:l));setRenaming(null);};
+
+  const cur=collections.find(l=>l.id===active);
+  const entries=cur?.entries||[];
+  const visEntries=hideOwned?entries.filter(e=>!e.owned):entries;
+  const ownedCount=entries.filter(e=>e.owned).length;
 
   return(
     <div>
       <div className="pill-wrap">
-        {wishlists.map(l=><span key={l.id} className={`pill${active===l.id?" pill-red":""}`} onClick={()=>{setActive(l.id);setShowSearch(false);}}>{l.name}<span style={{fontSize:11,opacity:.6,marginLeft:4}}>({(l.entries||[]).length})</span></span>)}
-        <button onClick={()=>setShowCreate(!showCreate)}>+ New List</button>
+        {collections.map(l=><span key={l.id} className={`pill${active===l.id?" pill-red":""}`} onClick={()=>{setActive(l.id);setShowSearch(false);}}>{l.name}<span style={{fontSize:11,opacity:.6,marginLeft:4}}>({(l.entries||[]).length})</span></span>)}
+        <button onClick={()=>setShowCreate(!showCreate)}>+ New Collection</button>
       </div>
-      {showCreate&&<div className="flex-gap" style={{marginBottom:16}}><input type="text" value={newName} onChange={e=>setNewName(e.target.value)} onKeyDown={e=>e.key==="Enter"&&create()} placeholder="List name..."/><button className="btn-blue" onClick={create}>Create</button><button onClick={()=>setShowCreate(false)}>Cancel</button></div>}
+      {showCreate&&<div className="flex-gap" style={{marginBottom:16}}><input type="text" value={newName} onChange={e=>setNewName(e.target.value)} onKeyDown={e=>e.key==="Enter"&&create()} placeholder="Collection name..."/><button className="btn-blue" onClick={create}>Create</button><button onClick={()=>setShowCreate(false)}>Cancel</button></div>}
       {cur&&(
         <div>
-          <div className="row" style={{marginBottom:12}}>
+          <div className="row" style={{marginBottom:12,flexWrap:"wrap",gap:8}}>
             {renaming===cur.id
               ?<><input type="text" value={renameVal} onChange={e=>setRenameVal(e.target.value)} onKeyDown={e=>e.key==="Enter"&&rename(cur.id)} style={{maxWidth:200}}/><button className="btn-blue small-btn" onClick={()=>rename(cur.id)}>Save</button><button className="small-btn" onClick={()=>setRenaming(null)}>Cancel</button></>
-              :<><h3 style={{fontSize:15,fontWeight:500}}>{cur.name}</h3>{entries.length>0&&<span style={{fontSize:13,color:"var(--text2)"}}>{fmt(entries.reduce((t,e)=>t+(e.price||0),0))||"$0.00"}</span>}<button className="small-btn" onClick={()=>{setRenaming(cur.id);setRenameVal(cur.name);}}>Rename</button><button className="small-btn btn-red" onClick={()=>del(cur.id)}>Delete list</button></>}
-            <div style={{marginLeft:"auto",display:"flex",gap:8,alignItems:"center"}}>
+              :<><h3 style={{fontSize:15,fontWeight:500}}>{cur.name}</h3><span style={{fontSize:12,color:"var(--text2)"}}>{ownedCount}/{entries.length} owned</span><button className="small-btn" onClick={()=>{setRenaming(cur.id);setRenameVal(cur.name);}}>Rename</button><button className="small-btn btn-red" onClick={()=>del(cur.id)}>Delete</button></>}
+            <div style={{marginLeft:"auto",display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+              <button className={`small-btn filter-btn${hideOwned?" active":""}`} onClick={()=>setHideOwned(h=>!h)}>{hideOwned?"Showing unwanted":"Hide owned"}</button>
               <div className="view-toggle"><button className={`view-btn${view==="list"?" active":""}`} onClick={()=>setView("list")}>List</button><button className={`view-btn${view==="grid"?" active":""}`} onClick={()=>setView("grid")}>Grid</button></div>
               <button className="btn-blue small-btn" onClick={()=>setShowSearch(!showSearch)}>{showSearch?"Hide search":"+ Add cards"}</button>
             </div>
           </div>
           {showSearch&&<div className="search-box"><CardSearch onAdd={(card,vKey,vLabel,price)=>addEntry(cur.id,card,vKey,vLabel,price)} placeholder="Search for a card..."/></div>}
           {!entries.length&&!showSearch&&<div className="empty">No cards yet. Click "+ Add cards" to search.</div>}
-          {view==="list"&&entries.map(e=>(
-            <div key={e.uid} className="card-item">
-              {e.card.images?.small&&<img src={e.card.images.small} alt={e.card.name} className="wi-img" loading="lazy"/>}
-              <div style={{flex:1,minWidth:0}}><div className="card-name">{e.card.name}</div><div className="card-sub">{e.card.set?.name} · {e.card.rarity||"Unknown"}</div><span className="variant-tag">{e.variantLabel}</span></div>
-              <div className="card-price">{e.price!=null?fmt(e.price):<span className="no-price-badge">no price</span>}<button className="remove-btn" onClick={()=>removeEntry(cur.id,e.uid)}>remove</button></div>
+
+          {view==="list"&&(
+            <div>
+              {visEntries.map(e=>(
+                <div key={e.uid} className={`coll-item${e.owned?" is-owned":" not-owned"}`}>
+                  {e.card.images?.small&&<img src={e.card.images.small} alt={e.card.name} className="wi-img" loading="lazy"/>}
+                  <div style={{flex:1,minWidth:0}}>
+                    <a href={tcgUrl(e.card)} target="_blank" rel="noopener noreferrer" style={{color:"var(--text)",textDecoration:"none"}}>
+                      <div className="card-name" style={{textDecoration:"underline",textDecorationColor:"var(--text3)",textUnderlineOffset:3}}>{e.card.name}</div>
+                    </a>
+                    <div className="card-sub">{e.card.set?.name} · {e.card.rarity||"Unknown"}</div>
+                    <span className="variant-tag">{e.variantLabel}</span>
+                    {e.owned&&<span className="owned-badge">Owned</span>}
+                  </div>
+                  <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4}}>
+                    <div className="card-price">{e.price!=null?fmt(e.price):<span className="no-price-badge">no price</span>}</div>
+                    <button className={`small-btn${e.owned?" btn-green":""}`} style={{fontSize:11}} onClick={()=>toggleOwned(cur.id,e.uid)}>{e.owned?"Owned":"Mark owned"}</button>
+                    <button className="remove-btn" onClick={()=>removeEntry(cur.id,e.uid)}>remove</button>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-          {view==="grid"&&<div className="grid-view">
-            {entries.map(e=>(
-              <div key={e.uid} className="grid-card">
-                {e.card.images?.small&&<img src={e.card.images.small} alt={e.card.name} loading="lazy"/>}
-                <div className="grid-card-name">{e.card.name}</div>
-                <div className="grid-card-sub">{e.variantLabel}</div>
-                <div className="grid-card-sub">{e.price!=null?fmt(e.price):"—"}</div>
-                <button onClick={()=>removeEntry(cur.id,e.uid)} className="small-btn btn-red" style={{fontSize:10,padding:"3px 8px",marginTop:2}}>remove</button>
-              </div>
-            ))}
-          </div>}
+          )}
+          {view==="grid"&&(
+            <div className="grid-view">
+              {visEntries.map(e=>(
+                <div key={e.uid} className={`grid-coll-card${e.owned?" is-owned":""}`}>
+                  {e.card.images?.small&&<img src={e.card.images.small} alt={e.card.name} loading="lazy"/>}
+                  <div className="flip-card-name">{e.card.name}</div>
+                  <div className="flip-card-sub">{e.variantLabel}</div>
+                  <div className="flip-card-sub">{e.price!=null?fmt(e.price):"—"}</div>
+                  {e.owned&&<span className="owned-badge">Owned</span>}
+                  <button className={`small-btn${e.owned?" btn-green":""}`} style={{fontSize:10,padding:"3px 8px",width:"100%",marginTop:2}} onClick={()=>toggleOwned(cur.id,e.uid)}>{e.owned?"Owned":"Mark owned"}</button>
+                  <button className="remove-btn" style={{textAlign:"center",width:"100%"}} onClick={()=>removeEntry(cur.id,e.uid)}>remove</button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
-      {!cur&&wishlists.length>0&&<div className="empty">Select a wishlist above.</div>}
-      {!wishlists.length&&!showCreate&&<div className="empty">No wishlists yet. Create one to get started.</div>}
+      {!cur&&collections.length>0&&<div className="empty">Select a collection above.</div>}
+      {!collections.length&&!showCreate&&<div className="empty">No collections yet. Create one to get started.</div>}
     </div>
   );
 }
@@ -314,7 +349,7 @@ function MasterSetsTab({masterSets,setMasterSets}){
   const [loadingSet,setLoadingSet]=useState(false);const [loadingCards,setLoadingCards]=useState(false);
   const [showSearch,setShowSearch]=useState(false);const [collapsed,setCollapsed]=useState({});
   const [hideOwned,setHideOwned]=useState(false);const [view,setView]=useState("list");
-  const [expandedGrid,setExpandedGrid]=useState(null);
+  const [flipped,setFlipped]=useState(null);
 
   const searchSets=async()=>{if(!q.trim())return;setLoadingSet(true);try{const r=await fetch(`${API}/sets?q=name:"${encodeURIComponent(q.trim())}"&pageSize=10`);const d=await r.json();setSetResults(d.data||[]);}catch{setSetResults([]);}setLoadingSet(false);};
 
@@ -334,16 +369,7 @@ function MasterSetsTab({masterSets,setMasterSets}){
   };
 
   const toggleEntry=(setId,entryId)=>setMasterSets(prev=>prev.map(s=>s.id===setId?{...s,checked:{...s.checked,[entryId]:!s.checked[entryId]}}:s));
-
-  const checkAllVariants=(setId,cardId)=>{
-    setMasterSets(prev=>prev.map(s=>{
-      if(s.id!==setId)return s;
-      const newChecked={...s.checked};
-      (s.entries||[]).filter(e=>e.cardId===cardId).forEach(e=>{newChecked[e.id]=true;});
-      return{...s,checked:newChecked};
-    }));
-  };
-
+  const checkAll=(setId,cardId)=>setMasterSets(prev=>prev.map(s=>{if(s.id!==setId)return s;const nc={...s.checked};(s.entries||[]).filter(e=>e.cardId===cardId).forEach(e=>{nc[e.id]=true;});return{...s,checked:nc};}));
   const removeSet=id=>{setMasterSets(prev=>prev.filter(s=>s.id!==id));if(active===id)setActive(null);};
   const cur=masterSets.find(s=>s.id===active);
 
@@ -366,7 +392,7 @@ function MasterSetsTab({masterSets,setMasterSets}){
           {loadingSet&&<div style={{fontSize:14,color:"var(--text2)"}}>Searching...</div>}
           {loadingCards&&<div style={{fontSize:14,color:"var(--text2)"}}>Loading cards and variants…</div>}
           {setResults.map(s=>(
-            <div key={s.id} className="card-item">
+            <div key={s.id} className="list-card-group" style={{padding:"8px 0",borderBottom:"none",marginBottom:6}}>
               {s.images?.logo&&<img src={s.images.logo} alt={s.name} style={{height:26,width:"auto",objectFit:"contain",flexShrink:0}}/>}
               <div style={{flex:1}}><div className="card-name" style={{fontSize:13}}>{s.name}</div><div className="card-sub">{s.series} · {s.printedTotal||s.total||"?"} cards</div></div>
               <button className="small-btn btn-blue" onClick={()=>addSet(s)}>Add</button>
@@ -384,10 +410,7 @@ function MasterSetsTab({masterSets,setMasterSets}){
         const remainVal=(cur.entries||[]).filter(e=>!cur.checked[e.id]).reduce((t,e)=>t+(e.price||0),0);
         const isOpen=!collapsed[cur.id];
         const groups=groupByCard(cur.entries||[]);
-        const visibleGroups=hideOwned
-          ?groups.filter(g=>g.variants.some(e=>!cur.checked[e.id]))
-          :groups;
-
+        const visGroups=hideOwned?groups.filter(g=>g.variants.some(e=>!cur.checked[e.id])):groups;
         return(
           <div>
             <div className="glass-card set-card">
@@ -426,19 +449,21 @@ function MasterSetsTab({masterSets,setMasterSets}){
             <div className={`collapsible${isOpen?" open":" closed"}`}>
               {view==="list"&&(
                 <div className="scrollable">
-                  {visibleGroups.map(g=>{
+                  {visGroups.map(g=>{
                     const allChecked=g.variants.every(e=>cur.checked[e.id]);
-                    const visVariants=hideOwned?g.variants.filter(e=>!cur.checked[e.id]):g.variants;
+                    const visVars=hideOwned?g.variants.filter(e=>!cur.checked[e.id]):g.variants;
                     return(
                       <div key={g.cardId} className="list-card-group">
                         {g.card.images?.small&&<img src={g.card.images.small} alt={g.card.name} className="list-card-img" loading="lazy"/>}
                         <div className="list-card-info">
                           <div style={{display:"flex",alignItems:"baseline",gap:8,marginBottom:1}}>
-                            <div className="card-name">{g.card.name}</div>
-                            {!allChecked&&<button className="small-btn btn-blue" style={{fontSize:10,padding:"2px 8px",flexShrink:0}} onClick={()=>checkAllVariants(cur.id,g.cardId)}>Check all</button>}
+                            <a href={tcgUrl(g.card)} target="_blank" rel="noopener noreferrer" style={{color:"var(--text)",textDecoration:"underline",textDecorationColor:"var(--text3)",textUnderlineOffset:3}}>
+                              <div className="card-name">{g.card.name}</div>
+                            </a>
+                            {!allChecked&&<button className="small-btn btn-blue" style={{fontSize:10,padding:"2px 8px",flexShrink:0}} onClick={()=>checkAll(cur.id,g.cardId)}>Check all</button>}
                           </div>
                           <div className="card-sub" style={{marginBottom:6}}>#{g.card.number} · {g.card.rarity||"Unknown"}</div>
-                          {visVariants.map(e=>(
+                          {visVars.map(e=>(
                             <VariantPill key={e.id} label={e.variantLabel} price={e.price} checked={!!cur.checked[e.id]} onToggle={()=>toggleEntry(cur.id,e.id)}/>
                           ))}
                         </div>
@@ -449,26 +474,34 @@ function MasterSetsTab({masterSets,setMasterSets}){
               )}
               {view==="grid"&&(
                 <div className="grid-view">
-                  {visibleGroups.map(g=>{
+                  {visGroups.map(g=>{
                     const checkedCount=g.variants.filter(e=>cur.checked[e.id]).length;
-                    const total=g.variants.length;
-                    const allChecked=checkedCount===total;
-                    const isExpanded=expandedGrid===g.cardId;
+                    const tot=g.variants.length;
+                    const allChecked=checkedCount===tot;
+                    const isFlipped=flipped===g.cardId;
                     return(
-                      <div key={g.cardId} className={`grid-card${allChecked?" all-owned":""}`} onClick={()=>setExpandedGrid(isExpanded?null:g.cardId)} style={{alignItems:"stretch"}}>
-                        {g.card.images?.small&&<img src={g.card.images.small} alt={g.card.name} loading="lazy"/>}
-                        <div className="grid-card-name">{g.card.name}</div>
-                        <div className="grid-card-sub">#{g.card.number} · {g.card.rarity}</div>
-                        <div className="grid-card-sub" style={{marginBottom:4}}>{checkedCount}/{total} owned</div>
-                        <div className="grid-card-progress"><div className="grid-card-progress-fill" style={{width:`${total?checkedCount/total*100:0}%`}}/></div>
-                        {isExpanded&&(
-                          <div style={{marginTop:8,width:"100%"}} onClick={e=>e.stopPropagation()}>
+                      <div key={g.cardId} className="flip-wrap" style={{position:"relative",minHeight:220}}>
+                        <div className={`flip-inner${isFlipped?" flipped":""}`} style={{position:"absolute",inset:0}}>
+                          {/* Front */}
+                          <div className={`flip-front${allChecked?" all-owned":""}`} style={{height:"100%"}} onClick={()=>setFlipped(isFlipped?null:g.cardId)}>
+                            {g.card.images?.small&&<img src={g.card.images.small} alt={g.card.name} className="flip-card-img" loading="lazy"/>}
+                            <div className="flip-card-name">{g.card.name}</div>
+                            <div className="flip-card-sub">#{g.card.number} · {g.card.rarity}</div>
+                            <div className="flip-card-sub">{checkedCount}/{tot} owned</div>
+                            <div className="flip-card-progress"><div className="flip-card-progress-fill" style={{width:`${tot?checkedCount/tot*100:0}%`}}/></div>
+                            <div className="flip-tap-hint">Tap to check off</div>
+                          </div>
+                          {/* Back */}
+                          <div className="flip-back">
+                            <div className="flip-card-name" style={{marginBottom:2}}>{g.card.name}</div>
+                            <div className="flip-card-sub" style={{marginBottom:6}}>#{g.card.number} · {g.card.rarity}</div>
                             {g.variants.map(e=>(
                               <VariantPill key={e.id} label={e.variantLabel} price={e.price} checked={!!cur.checked[e.id]} onToggle={()=>toggleEntry(cur.id,e.id)}/>
                             ))}
-                            {!allChecked&&<button className="small-btn btn-blue" style={{fontSize:10,width:"100%",marginTop:4}} onClick={()=>checkAllVariants(cur.id,g.cardId)}>Check all</button>}
+                            {!allChecked&&<button className="small-btn btn-blue" style={{fontSize:10,width:"100%",marginTop:4}} onClick={e=>{e.stopPropagation();checkAll(cur.id,g.cardId);}}>Check all</button>}
+                            <button className="small-btn" style={{fontSize:10,width:"100%",marginTop:4}} onClick={()=>setFlipped(null)}>Flip back</button>
                           </div>
-                        )}
+                        </div>
                       </div>
                     );
                   })}
@@ -485,12 +518,15 @@ function MasterSetsTab({masterSets,setMasterSets}){
 }
 
 // ── BuyListTab ────────────────────────────────────────────────────────────────
-function BuyListTab({wishlists,masterSets,setMasterSets}){
+function BuyListTab({collections,masterSets,setMasterSets}){
   const [collapsed,setCollapsed]=useState({});
   const toggle=id=>setCollapsed(p=>({...p,[id]:!p[id]}));
   const sections=[];
   masterSets.forEach(s=>{const needed=(s.entries||[]).filter(e=>!s.checked[e.id]);if(needed.length)sections.push({id:s.id,name:s.name,logo:s.logo,entries:needed,type:"master"});});
-  wishlists.forEach(l=>{if((l.entries||[]).length)sections.push({id:l.id,name:l.name,logo:null,entries:l.entries,type:"wishlist"});});
+  collections.forEach(l=>{
+    const unwanted=(l.entries||[]).filter(e=>!e.owned);
+    if(unwanted.length)sections.push({id:l.id,name:l.name,logo:null,entries:unwanted,type:"collection"});
+  });
   const grand=sections.reduce((t,s)=>t+s.entries.reduce((st,e)=>st+(e.price||0),0),0);
   if(!sections.length)return<div className="empty">Your buy list is empty.</div>;
   return(
@@ -503,17 +539,23 @@ function BuyListTab({wishlists,masterSets,setMasterSets}){
         <div key={sec.id} style={{marginBottom:10}}>
           <div className="sec-hdr" onClick={()=>toggle(sec.id)}>
             {sec.logo&&<img src={sec.logo} alt={sec.name} style={{height:20,objectFit:"contain",flexShrink:0}}/>}
-            {!sec.logo&&<span className="wishlist-tag">wishlist</span>}
+            {!sec.logo&&<span className="wishlist-tag">collection</span>}
             <span className="sec-name">{sec.name}</span>
             <span className="sec-meta">{sec.entries.length} · {fmt(sub)||"$0.00"}</span>
             <span className={`chevron${isOpen?" open":""}`}>▼</span>
           </div>
           <div className={`collapsible${isOpen?" open":" closed"}`}>
-            {sec.type==="wishlist"
+            {sec.type==="collection"
               ?sec.entries.map(e=>(
-                <div key={e.uid} className="card-item">
-                  {e.card.images?.small&&<img src={e.card.images.small} alt={e.card.name} className="wi-img" loading="lazy"/>}
-                  <div style={{flex:1,minWidth:0}}><div className="card-name">{e.card.name}</div><div className="card-sub">{e.card.set?.name}</div><span className="variant-tag">{e.variantLabel}</span></div>
+                <div key={e.uid} className="list-card-group">
+                  {e.card.images?.small&&<img src={e.card.images.small} alt={e.card.name} className="list-card-img" loading="lazy"/>}
+                  <div style={{flex:1,minWidth:0}}>
+                    <a href={tcgUrl(e.card)} target="_blank" rel="noopener noreferrer" style={{color:"var(--text)",textDecoration:"underline",textDecorationColor:"var(--text3)",textUnderlineOffset:3}}>
+                      <div className="card-name">{e.card.name}</div>
+                    </a>
+                    <div className="card-sub">{e.card.set?.name}</div>
+                    <span className="variant-tag">{e.variantLabel}</span>
+                  </div>
                   <div className="card-price">{e.price!=null?fmt(e.price):<span className="no-price-badge">no price</span>}</div>
                 </div>
               ))
@@ -521,7 +563,9 @@ function BuyListTab({wishlists,masterSets,setMasterSets}){
                 <div key={g.cardId} className="list-card-group">
                   {g.card.images?.small&&<img src={g.card.images.small} alt={g.card.name} className="list-card-img" loading="lazy"/>}
                   <div className="list-card-info">
-                    <div className="card-name" style={{marginBottom:1}}>{g.card.name}</div>
+                    <a href={tcgUrl(g.card)} target="_blank" rel="noopener noreferrer" style={{color:"var(--text)",textDecoration:"underline",textDecorationColor:"var(--text3)",textUnderlineOffset:3}}>
+                      <div className="card-name" style={{marginBottom:1}}>{g.card.name}</div>
+                    </a>
                     <div className="card-sub" style={{marginBottom:6}}>#{g.card.number} · {g.card.set?.name}</div>
                     {g.variants.map(e=>(
                       <VariantPill key={e.id} label={e.variantLabel} price={e.price} checked={false}
@@ -539,15 +583,17 @@ function BuyListTab({wishlists,masterSets,setMasterSets}){
 }
 
 // ── StatsTab ──────────────────────────────────────────────────────────────────
-function StatsTab({wishlists,masterSets}){
+function StatsTab({collections,masterSets}){
   const totalOwned=masterSets.reduce((t,s)=>t+Object.values(s.checked).filter(Boolean).length,0);
   const totalNeeded=masterSets.reduce((t,s)=>t+(s.entries||[]).filter(e=>!s.checked[e.id]).length,0);
-  const wTotal=wishlists.reduce((t,l)=>t+(l.entries||[]).length,0);
-  const buyVal=masterSets.reduce((t,s)=>t+(s.entries||[]).filter(e=>!s.checked[e.id]).reduce((st,e)=>st+(e.price||0),0),0)+wishlists.reduce((t,l)=>t+(l.entries||[]).reduce((st,e)=>st+(e.price||0),0),0);
+  const collTotal=collections.reduce((t,l)=>t+(l.entries||[]).length,0);
+  const collOwned=collections.reduce((t,l)=>t+(l.entries||[]).filter(e=>e.owned).length,0);
+  const buyVal=masterSets.reduce((t,s)=>t+(s.entries||[]).filter(e=>!s.checked[e.id]).reduce((st,e)=>st+(e.price||0),0),0)
+    +collections.reduce((t,l)=>t+(l.entries||[]).filter(e=>!e.owned).reduce((st,e)=>st+(e.price||0),0),0);
   return(
     <div>
       <div className="stat-card-grid">
-        {[["Variants owned",totalOwned],["Variants needed",totalNeeded],["Wishlist entries",wTotal],["Est. buy list value",fmt(buyVal)||"$0.00"]].map(([l,v])=>(
+        {[["Variants owned",totalOwned],["Variants needed",totalNeeded],["Collection entries",collTotal],["Est. buy list value",fmt(buyVal)||"$0.00"]].map(([l,v])=>(
           <div key={l} className="stat-card"><div className="stat-card-lbl">{l}</div><div className="stat-card-val">{v}</div></div>
         ))}
       </div>
@@ -562,29 +608,39 @@ function StatsTab({wishlists,masterSets}){
           );})}
         </div>
       )}
-      {wishlists.length>0&&(
+      {collections.length>0&&(
         <div style={{marginTop:20}}>
-          <h3 style={{fontSize:15,fontWeight:500,marginBottom:12}}>Wishlists</h3>
-          {wishlists.map(l=>{const val=(l.entries||[]).reduce((t,e)=>t+(e.price||0),0);return(
-            <div key={l.id} style={{display:"flex",justifyContent:"space-between",padding:"9px 12px",background:"var(--glass)",borderRadius:"var(--radius)",marginBottom:6,border:"0.5px solid var(--border)"}}>
-              <span style={{fontSize:13}}>{l.name}</span>
-              <span style={{fontSize:13,color:"var(--text2)"}}>{(l.entries||[]).length} entries · {fmt(val)||"$0.00"}</span>
-            </div>
-          );})}
+          <h3 style={{fontSize:15,fontWeight:500,marginBottom:12}}>Collections</h3>
+          {collections.map(l=>{
+            const owned=(l.entries||[]).filter(e=>e.owned).length;
+            const total=(l.entries||[]).length;
+            return(
+              <div key={l.id} style={{display:"flex",justifyContent:"space-between",padding:"9px 12px",background:"var(--glass)",borderRadius:"var(--radius)",marginBottom:6,border:"0.5px solid var(--border)"}}>
+                <span style={{fontSize:13}}>{l.name}</span>
+                <span style={{fontSize:13,color:"var(--text2)"}}>{owned}/{total} owned</span>
+              </div>
+            );
+          })}
         </div>
       )}
-      {!masterSets.length&&!wishlists.length&&<div className="empty">No data yet.</div>}
+      {!masterSets.length&&!collections.length&&<div className="empty">No data yet.</div>}
     </div>
   );
 }
 
 // ── App ───────────────────────────────────────────────────────────────────────
-const TABS=["Wishlists","Master Sets","Buy List","Stats"];
+const TABS=["Collections","Master Sets","Buy List","Stats"];
 function App(){
   const [tab,setTab]=useState(0);const [ready,setReady]=useState(false);
-  const [wishlists,setWRaw]=useState(()=>lstore("pkm_wishlists2",[]));
+  // Migrate old wishlists key -> collections key, preserving data
+  const [collections,setCRaw]=useState(()=>{
+    const existing=lstore("pkm_collections2",null);
+    if(existing)return existing;
+    const old=lstore("pkm_wishlists2",[]);
+    return old.map(l=>({...l,entries:(l.entries||[]).map(e=>({...e,owned:e.owned??false}))}));
+  });
   const [masterSets,setMRaw]=useState(()=>lstore("pkm_mastersets2",[]));
-  const setWishlists=v=>{const n=typeof v==="function"?v(wishlists):v;setWRaw(n);sstore("pkm_wishlists2",n);};
+  const setCollections=v=>{const n=typeof v==="function"?v(collections):v;setCRaw(n);sstore("pkm_collections2",n);};
   const setMasterSets=v=>{const n=typeof v==="function"?v(masterSets):v;setMRaw(n);sstore("pkm_mastersets2",n);};
   useEffect(()=>{loadVariantsData().then(()=>setReady(true));},[]);
   if(!ready)return<div style={{padding:60,textAlign:"center",color:"var(--text2)",fontSize:14}}>Loading...</div>;
@@ -601,15 +657,15 @@ function App(){
         {TABS.map((t,i)=>(
           <button key={t} className={`tab-btn${tab===i?" "+activeClass:""}`} onClick={()=>setTab(i)}>
             {t}
-            {t==="Wishlists"&&wishlists.length>0&&<span className="badge">{wishlists.length}</span>}
+            {t==="Collections"&&collections.length>0&&<span className="badge">{collections.length}</span>}
             {t==="Master Sets"&&masterSets.length>0&&<span className="badge">{masterSets.length}</span>}
           </button>
         ))}
       </div>
-      {tab===0&&<WishlistsTab wishlists={wishlists} setWishlists={setWishlists}/>}
+      {tab===0&&<CollectionsTab collections={collections} setCollections={setCollections}/>}
       {tab===1&&<MasterSetsTab masterSets={masterSets} setMasterSets={setMasterSets}/>}
-      {tab===2&&<BuyListTab wishlists={wishlists} masterSets={masterSets} setMasterSets={setMasterSets}/>}
-      {tab===3&&<StatsTab wishlists={wishlists} masterSets={masterSets}/>}
+      {tab===2&&<BuyListTab collections={collections} masterSets={masterSets} setMasterSets={setMasterSets}/>}
+      {tab===3&&<StatsTab collections={collections} masterSets={masterSets}/>}
     </div>
   );
 }
