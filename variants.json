@@ -1,0 +1,39 @@
+{
+  "_readme": "This file defines special card variants not tracked by the pokemontcg.io API. Add new sets here when they release with special reverse holo patterns. 'applicableTo' can be 'all' (Pokémon + Trainers) or 'pokemon' (Pokémon only, not Trainers or ex cards).",
+
+  "sets": {
+
+    "sv8pt5": {
+      "name": "Prismatic Evolutions",
+      "variants": [
+        { "key": "pokeBallReverseHolofoil",  "label": "Poké Ball Reverse Holo",   "applicableTo": "all"     },
+        { "key": "masterBallReverseHolofoil", "label": "Master Ball Reverse Holo", "applicableTo": "pokemon" }
+      ]
+    },
+
+    "sv105": {
+      "name": "Black Bolt",
+      "variants": [
+        { "key": "pokeBallReverseHolofoil",  "label": "Poké Ball Reverse Holo",   "applicableTo": "all"     },
+        { "key": "masterBallReverseHolofoil", "label": "Master Ball Reverse Holo", "applicableTo": "pokemon" }
+      ]
+    },
+
+    "sv106": {
+      "name": "White Flare",
+      "variants": [
+        { "key": "pokeBallReverseHolofoil",  "label": "Poké Ball Reverse Holo",   "applicableTo": "all"     },
+        { "key": "masterBallReverseHolofoil", "label": "Master Ball Reverse Holo", "applicableTo": "pokemon" }
+      ]
+    },
+
+    "me2pt5": {
+      "name": "Ascended Heroes",
+      "variants": [
+        { "key": "energyReverseHolofoil", "label": "Energy Reverse Holo", "applicableTo": "all" },
+        { "key": "ballReverseHolofoil",   "label": "Ball Reverse Holo",   "applicableTo": "all" }
+      ]
+    }
+
+  }
+}
