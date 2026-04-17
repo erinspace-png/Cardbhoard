@@ -492,11 +492,12 @@ function MasterSetsTab({masterSets,setMasterSets}){
           return(<div key={g.cardId} className="flip-wrap" style={{height:cardH}}>
             <div className={`flip-inner${isFlipped?" flipped":""}`} style={{height:cardH}}>
               <div className={`flip-front${allChecked?" all-owned":""}`} style={{height:cardH}} onClick={()=>setFlipped(isFlipped?null:g.cardId)}>
-                {g.card.images?.small&&<img src={g.card.images.small} alt={g.card.name} className="flip-card-img" loading="lazy"/>}
-                <div className="flip-card-name">{g.card.name}</div>
-                <div className="flip-card-sub">#{g.card.number} · {g.card.rarity}</div>
-                <div className="flip-card-sub">{checkedCount}/{tot} owned</div>
-                <div className="flip-card-progress"><div className="flip-card-progress-fill" style={{width:`${tot?checkedCount/tot*100:0}%`}}/></div>
+                {g.card.images?.small&&<img src={g.card.images.small} alt={g.card.name} className="flip-card-img" style={{maxWidth:130}} loading="lazy"/>}
+                <div className="flip-card-name" style={{fontSize:14,marginTop:6}}>{g.card.name}</div>
+                <div className="flip-card-sub" style={{fontSize:12}}>#{g.card.number} · {g.card.rarity}</div>
+                <div className="flip-card-sub" style={{fontSize:12,marginTop:2}}>{checkedCount}/{tot} owned</div>
+                <div className="flip-card-progress" style={{marginTop:4}}><div className="flip-card-progress-fill" style={{width:`${tot?checkedCount/tot*100:0}%`}}/></div>
+                <div style={{marginTop:8}} onClick={e=>e.stopPropagation()}><TcgPill card={g.card}/></div>
               </div>
                 <div className="flip-back" style={{height:cardH}} onClick={()=>setFlipped(null)}>
                 <div className="flip-card-name" style={{marginBottom:1,flexShrink:0}}>{g.card.name}</div>
