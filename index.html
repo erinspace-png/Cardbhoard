@@ -147,7 +147,7 @@ button:active{transform:scale(.98);}
 .tcg-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:12px;font-size:11px;background:rgba(39,36,219,.2);border:0.5px solid rgba(86,84,240,.4);color:#c0bfff;text-decoration:none;margin-top:4px;transition:background .15s;}
 .tcg-pill:hover{background:rgba(39,36,219,.35);}
 /* Grid view */
-.grid-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:16px;max-width:100%;}
+.grid-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;max-width:100%;}
 /* Flip card */
 .flip-wrap{perspective:800px;}
 .flip-inner{position:relative;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.4,0,.2,1);}
@@ -488,7 +488,7 @@ function MasterSetsTab({masterSets,setMasterSets}){
           const tot=g.variants.length;
           const allChecked=checkedCount===tot;
           const isFlipped=flipped===g.cardId;
-                              const cardH=Math.max(224,62+(tot*31)+(allChecked?0:32)+52);
+                              const cardH=380;
           return(<div key={g.cardId} className="flip-wrap" style={{height:cardH}}>
             <div className={`flip-inner${isFlipped?" flipped":""}`} style={{height:cardH}}>
               <div className={`flip-front${allChecked?" all-owned":""}`} style={{height:cardH}} onClick={()=>setFlipped(isFlipped?null:g.cardId)}>
@@ -498,14 +498,14 @@ function MasterSetsTab({masterSets,setMasterSets}){
                 <div className="flip-card-sub">{checkedCount}/{tot} owned</div>
                 <div className="flip-card-progress"><div className="flip-card-progress-fill" style={{width:`${tot?checkedCount/tot*100:0}%`}}/></div>
               </div>
-              <div className="flip-back" style={{height:cardH}} onClick={()=>setFlipped(null)}>
-                <div className="flip-card-name" style={{marginBottom:1}}>{g.card.name}</div>
-                <div className="flip-card-sub" style={{marginBottom:6}}>#{g.card.number} · {g.card.rarity}</div>
+                <div className="flip-back" style={{height:cardH}} onClick={()=>setFlipped(null)}>
+                <div className="flip-card-name" style={{marginBottom:1,flexShrink:0}}>{g.card.name}</div>
+                <div className="flip-card-sub" style={{marginBottom:6,flexShrink:0}}>#{g.card.number} · {g.card.rarity}</div>
                 {g.variants.map(e=>(<div key={e.id} className={`variant-pill${cur.checked[e.id]?" checked":""}`} onClick={ev=>{ev.stopPropagation();toggleEntry(cur.id,e.id);}}>
                   <input type="checkbox" checked={!!cur.checked[e.id]} onChange={()=>{}} onClick={ev=>ev.stopPropagation()} style={{pointerEvents:"none"}}/>
                   <span className="vp-label">{e.variantLabel}</span>
                 </div>))}
-                {!allChecked&&<button className="small-btn btn-blue" style={{fontSize:10,width:"100%",marginTop:4}} onClick={ev=>{ev.stopPropagation();checkAll(cur.id,g.cardId);}}>Check all</button>}
+                {!allChecked&&<button className="small-btn btn-blue" style={{fontSize:10,width:"100%",marginTop:4,flexShrink:0}} onClick={ev=>{ev.stopPropagation();checkAll(cur.id,g.cardId);}}>Check all</button>}
               </div>
             </div>
           </div>);
