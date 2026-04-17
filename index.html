@@ -20,8 +20,25 @@
   --radius:10px;--radius-lg:14px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh;}
-#root{max-width:900px;margin:0 auto;padding:24px 16px 80px;}
+body{
+  font-family:system-ui,-apple-system,sans-serif;color:var(--text);font-size:15px;line-height:1.5;min-height:100vh;
+  background:url('https://erinspace-png.github.io/Cardbhoard/bg.jpg') center center / cover fixed no-repeat;
+}
+body::before{
+  content:"";position:fixed;inset:0;background:rgba(10,16,35,0.55);z-index:0;pointer-events:none;
+}
+#root{
+  position:relative;z-index:1;
+  max-width:900px;margin:0 auto;padding:24px 16px 80px;
+}
+.content-panel{
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border:0.5px solid rgba(255,255,255,0.15);
+  border-radius:20px;
+  padding:28px 24px;
+}
 h1{font-size:20px;font-weight:500;}
 input,button{font-family:inherit;font-size:14px;color:var(--text);}
 input[type=text]{background:var(--bg-input);border:0.5px solid var(--border);border-radius:var(--radius);padding:9px 13px;outline:none;width:100%;color:var(--text);transition:border-color .18s,box-shadow .18s;}
@@ -605,7 +622,7 @@ function App(){
   useEffect(()=>{loadVariantsData().then(()=>setReady(true));},[]);
   if(!ready)return<div style={{padding:60,textAlign:"center",color:"var(--text2)",fontSize:14}}>Loading...</div>;
   const activeClass=tab===2?"active-red":"active-blue";
-  return(<div>
+  return(<div className="content-panel">
     <div className="app-header">
       <div className="header-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#a8a6ff" strokeWidth="1.5"/><line x1="2" y1="12" x2="22" y2="12" stroke="#a8a6ff" strokeWidth="1.5"/><circle cx="12" cy="12" r="3" fill="#a8a6ff"/></svg></div>
       <h1>Cardbhoard: A Card Collecting Tracker</h1>
