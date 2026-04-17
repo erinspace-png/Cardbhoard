@@ -116,13 +116,13 @@ button:active{transform:scale(.98);}
 .flip-wrap{perspective:800px;}
 .flip-inner{position:relative;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.4,0,.2,1);}
 .flip-inner.flipped{transform:rotateY(180deg);}
-.flip-front,.flip-back{backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--radius-lg);border:0.5px solid var(--border);width:100%;}
+.flip-front,.flip-back{backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--radius-lg);border:0.5px solid var(--border);width:100%;position:absolute;top:0;left:0;}
 .flip-front{background:var(--glass);padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:background .18s,border-color .18s;}
 .flip-front:hover{background:var(--glass-hover);border-color:var(--border-strong);}
 .flip-front.all-owned{opacity:.5;}
-.flip-back{position:absolute;top:0;left:0;background:rgba(20,30,55,.97);padding:10px;transform:rotateY(180deg);display:flex;flex-direction:column;gap:4px;}
+.flip-back{background:rgba(20,30,55,.97);padding:10px;transform:rotateY(180deg);display:flex;flex-direction:column;gap:4px;cursor:pointer;}
 .flip-card-img{width:100%;max-width:100px;height:auto;border-radius:4px;}
-.flip-card-name{font-size:11px;font-weight:500;text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.flip-card-name{font-size:11px;font-weight:500;text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;}
 .flip-card-sub{font-size:10px;color:var(--text2);text-align:center;}
 .flip-card-progress{width:100%;height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
 .flip-card-progress-fill{height:100%;background:var(--pk-blue);border-radius:2px;}
@@ -478,13 +478,13 @@ function MasterSetsTab({masterSets,setMasterSets}){
                     const tot=g.variants.length;
                     const allChecked=checkedCount===tot;
                     const isFlipped=flipped===g.cardId;
-                    // Estimate back height: header ~52px + variants * 34px + check-all btn ~30px + flip btn ~30px + padding
-                    const backH=52+(tot*34)+(allChecked?0:30)+30+20;
+                    // Height: image~140 + name~18 + sub~16 + count~16 + progress~10 + gaps~24 = ~224 front
+                    // Back: name~18 + sub~16 + gap~8 + variants*(28+3) + check-all~28 + padding~20
+                    const cardH=Math.max(224, 62+(tot*31)+(allChecked?0:32)+20);
                     return(
-                      <div key={g.cardId} className="flip-wrap" style={{minHeight:backH}}>
-                        <div className={`flip-inner${isFlipped?" flipped":""}`} style={{minHeight:backH}}>
-                          {/* Front */}
-                          <div className={`flip-front${allChecked?" all-owned":""}`} style={{minHeight:backH}} onClick={()=>setFlipped(isFlipped?null:g.cardId)}>
+                      <div key={g.cardId} className="flip-wrap" style={{height:cardH}}>
+                        <div className={`flip-inner${isFlipped?" flipped":""}`} style={{height:cardH}}>
+                          <div className={`flip-front${allChecked?" all-owned":""}`} style={{height:cardH}} onClick={()=>setFlipped(isFlipped?null:g.cardId)}>
                             {g.card.images?.small&&<img src={g.card.images.small} alt={g.card.name} className="flip-card-img" loading="lazy"/>}
                             <a href={tcgUrl(g.card)} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{textDecoration:"none",width:"100%"}}>
                               <div className="flip-card-name" style={{textDecoration:"underline",textDecorationColor:"var(--text3)",textUnderlineOffset:2}}>{g.card.name}</div>
@@ -493,15 +493,16 @@ function MasterSetsTab({masterSets,setMasterSets}){
                             <div className="flip-card-sub">{checkedCount}/{tot} owned</div>
                             <div className="flip-card-progress"><div className="flip-card-progress-fill" style={{width:`${tot?checkedCount/tot*100:0}%`}}/></div>
                           </div>
-                          {/* Back */}
-                          <div className="flip-back" style={{minHeight:backH}}>
-                            <div className="flip-card-name" style={{marginBottom:1}}>{g.card.name}</div>
+                          <div className="flip-back" style={{height:cardH}} onClick={()=>setFlipped(null)}>
+                            <div className="flip-card-name" style={{marginBottom:1,color:"#fff"}}>{g.card.name}</div>
                             <div className="flip-card-sub" style={{marginBottom:6}}>#{g.card.number} · {g.card.rarity}</div>
                             {g.variants.map(e=>(
-                              <VariantPill key={e.id} label={e.variantLabel} price={e.price} checked={!!cur.checked[e.id]} onToggle={()=>toggleEntry(cur.id,e.id)}/>
+                              <div key={e.id} className={`variant-pill${cur.checked[e.id]?" checked":""}`} onClick={ev=>{ev.stopPropagation();toggleEntry(cur.id,e.id);}}>
+                                <input type="checkbox" checked={!!cur.checked[e.id]} onChange={()=>{}} onClick={ev=>ev.stopPropagation()} style={{pointerEvents:"none"}}/>
+                                <span className="vp-label">{e.variantLabel}</span>
+                              </div>
                             ))}
-                            {!allChecked&&<button className="small-btn btn-blue" style={{fontSize:10,width:"100%",marginTop:4}} onClick={e=>{e.stopPropagation();checkAll(cur.id,g.cardId);}}>Check all</button>}
-                            <button className="small-btn" style={{fontSize:10,width:"100%",marginTop:4}} onClick={()=>setFlipped(null)}>Flip back</button>
+                            {!allChecked&&<button className="small-btn btn-blue" style={{fontSize:10,width:"100%",marginTop:4}} onClick={ev=>{ev.stopPropagation();checkAll(cur.id,g.cardId);}}>Check all</button>}
                           </div>
                         </div>
                       </div>
